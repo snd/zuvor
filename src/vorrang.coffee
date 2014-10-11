@@ -155,6 +155,36 @@ do ->
         results.push k
     return results
 
+  # find those elements whose children are all in xs
+  # O(xs.length)
+  Dag.prototype.whereAllChildrenIn = (xs) ->
+    # dont inherit from the Object prototype such that we dont need to use hasOwnProperty
+    xsSet = Object.create(null)
+    # for fast lookup
+    for x in xs
+      xsSet[x] = true
+    # dont inherit from the Object prototype such that we dont need to use hasOwnProperty
+    resultSet = Object.create(null)
+    for x in xs
+      node = this.nodes[x]
+      unless node?
+        throw new Error "searching whereAllChildrenIn of `#{x}` which is not in graph"
+      for key, parent of node.parents
+        # dont look at the same node twice
+        if resultSet[key]?
+          continue
+        allChildrenIn = true
+        for childValue of parent.children
+          unless xsSet[childValue]?
+            allChildrenIn = false
+            break
+        resultSet[key] = allChildrenIn
+    results = []
+    for k, v of resultSet
+      if v
+        results.push k
+    return results
+
   ###################################################################################
   # nodejs or browser?
 
