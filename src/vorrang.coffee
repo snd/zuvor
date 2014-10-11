@@ -139,7 +139,7 @@ do ->
       node = this.nodes[x]
       unless node?
         throw new Error "searching whereAllParentsIn of `#{x}` which is not in graph"
-      for key,child of node.children
+      for key, child of node.children
         # dont look at the same node twice
         if resultSet[key]?
           continue
