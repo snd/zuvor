@@ -2,15 +2,7 @@
 var __hasProp = {}.hasOwnProperty;
 
 (function() {
-  var Dag, Dag2, Node, Set, isObjectEmpty, vorrang;
-  vorrang = {};
-  if (typeof window !== "undefined" && window !== null) {
-    window.vorrang = vorrang;
-  } else if ((typeof module !== "undefined" && module !== null ? module.exports : void 0) != null) {
-    module.exports = vorrang;
-  } else {
-    throw new Error('either the `window` global or the `module.exports` global must be present');
-  }
+  var Dag, Node, isObjectEmpty;
   isObjectEmpty = function(x) {
     var v;
     for (v in x) {
@@ -18,179 +10,6 @@ var __hasProp = {}.hasOwnProperty;
       return false;
     }
     return true;
-  };
-  Set = function(other) {
-    this._map = Object.create(null);
-    this.length = 0;
-    if (other != null) {
-      this.add(other);
-    }
-    return this;
-  };
-  Set.prototype = {
-    isIn: function(x) {
-      return this._map[x] != null;
-    },
-    isEmpty: function() {
-      return this.length === 0;
-    },
-    isEqual: function(other) {
-      var that;
-      that = this;
-      return that.length === other.length && other.elements().every(function(x) {
-        return that.isIn(x);
-      });
-    },
-    toString: function() {
-      return '#{' + Object.keys(this._map).join(' ') + '}';
-    },
-    elements: function() {
-      var elements, k, v, _ref;
-      elements = [];
-      _ref = this._map;
-      for (k in _ref) {
-        v = _ref[k];
-        if (v) {
-          elements.push(k);
-        }
-      }
-      return elements;
-    },
-    add: function(other) {
-      var key, type, v, _i, _len;
-      type = typeof other;
-      if (type === 'string' || type === 'number') {
-        if (!this.isIn(other)) {
-          this._map[other] = true;
-          this.length++;
-        }
-      } else if (other instanceof Set) {
-        for (key in other._map) {
-          if (!this.isIn(key)) {
-            this._map[key] = true;
-            this.length++;
-          }
-        }
-      } else if (Array.isArray(other)) {
-        for (_i = 0, _len = other.length; _i < _len; _i++) {
-          v = other[_i];
-          if (!this.isIn(v)) {
-            this._map[v] = true;
-            this.length++;
-          }
-        }
-      } else {
-        throw new TypeError('unsupported argument type');
-      }
-      return this;
-    },
-    remove: function(other) {
-      var key, type, v, _i, _len;
-      type = typeof other;
-      if (type === 'string' || type === 'number') {
-        if (this.isIn(other)) {
-          this._map[other] = void 0;
-          this.length--;
-        }
-      } else if (other instanceof Set) {
-        for (key in other._map) {
-          if (this.isIn(key)) {
-            this._map[key] = void 0;
-            this.length--;
-          }
-        }
-      } else if (Array.isArray(other)) {
-        for (_i = 0, _len = other.length; _i < _len; _i++) {
-          v = other[_i];
-          if (this.isIn(v)) {
-            this._map[v] = void 0;
-            this.length--;
-          }
-        }
-      } else {
-        throw new TypeError('unsupported argument type');
-      }
-      return this;
-    },
-    clone: function() {
-      return new Set(this);
-    }
-  };
-  Dag = function() {
-    this._before = Object.create(null);
-    return this;
-  };
-  Dag.prototype = {
-    before: function(a, b) {
-      if (a === b) {
-        throw new Error('arguments must not be equal');
-      }
-      if (this.isBefore(b, a)) {
-        throw new Error("trying to set `" + a + "` < `" + b + "` but already `" + b + "` < `" + a + "`");
-      }
-      if (this._before[b] == null) {
-        this._before[b] = new Set;
-      }
-      this._before[b].add(a);
-      if (this._before[a] == null) {
-        this._before[a] = new Set;
-      }
-      return this;
-    },
-    isIn: function(x) {
-      return this._before[x] != null;
-    },
-    isBefore: function(a, b) {
-      var before, evenBefore, that;
-      that = this;
-      if (!this.isIn(a || !this.isIn(b))) {
-        return false;
-      }
-      before = that._before[b];
-      if (before == null) {
-        return false;
-      }
-      while (!before.isEmpty()) {
-        if (before.isIn(a)) {
-          return true;
-        }
-        evenBefore = new Set();
-        before.elements().forEach(function(c) {
-          var beforeC;
-          beforeC = that._before[c];
-          if (beforeC != null) {
-            return evenBefore.add(beforeC);
-          }
-        });
-        before = evenBefore;
-      }
-      return false;
-    },
-    elements: function() {
-      return Object.keys(this._before);
-    },
-    minElements: function() {
-      var k, minElements, v, _ref;
-      minElements = [];
-      _ref = this._before;
-      for (k in _ref) {
-        v = _ref[k];
-        if (v.isEmpty()) {
-          minElements.push(k);
-        }
-      }
-      return minElements;
-    },
-    maxElements: function() {
-      var k, maxElements, v, _ref;
-      maxElements = new Set(Object.keys(this._before));
-      _ref = this._before;
-      for (k in _ref) {
-        v = _ref[k];
-        maxElements.remove(v);
-      }
-      return maxElements.elements();
-    }
   };
   Node = function(value) {
     this.value = value;
@@ -206,13 +25,21 @@ var __hasProp = {}.hasOwnProperty;
       return this.children[node.value] = node;
     }
   };
-  Dag2 = function() {
+  Dag = function() {
     this.nodes = Object.create(null);
     return this;
   };
-  Dag2.prototype = {};
-  Dag2.prototype.before = function(a, b) {
-    var nodeA, nodeB;
+  Dag.prototype = {};
+  Dag.prototype.before = function(a, b) {
+    var nodeA, nodeB, typeA, typeB;
+    typeA = typeof a;
+    if (!(typeA === 'string' || typeA === 'number')) {
+      throw new TypeError("argument a must be a string or number but is " + typeA);
+    }
+    typeB = typeof b;
+    if (!(typeB === 'string' || typeB === 'number')) {
+      throw new TypeError("argument b must be a string or number but is " + typeB);
+    }
     if (a === b) {
       throw new Error('arguments must not be equal');
     }
@@ -233,10 +60,10 @@ var __hasProp = {}.hasOwnProperty;
     nodeB.addParent(nodeA);
     return this;
   };
-  Dag2.prototype.isIn = function(x) {
+  Dag.prototype.isIn = function(x) {
     return this.nodes[x] != null;
   };
-  Dag2.prototype.isBefore = function(a, b) {
+  Dag.prototype.isBefore = function(a, b) {
     var child, key, nextNodes, node, nodeA, nodeB, nodes, that, _i, _len, _ref;
     that = this;
     nodeA = this.nodes[a];
@@ -262,10 +89,10 @@ var __hasProp = {}.hasOwnProperty;
     }
     return false;
   };
-  Dag2.prototype.elements = function() {
+  Dag.prototype.elements = function() {
     return Object.keys(this.nodes);
   };
-  Dag2.prototype.minElements = function() {
+  Dag.prototype.parentless = function() {
     var elements, key, node, _ref;
     elements = [];
     _ref = this.nodes;
@@ -277,7 +104,7 @@ var __hasProp = {}.hasOwnProperty;
     }
     return elements;
   };
-  Dag2.prototype.maxElements = function() {
+  Dag.prototype.childless = function() {
     var elements, key, node, _ref;
     elements = [];
     _ref = this.nodes;
@@ -289,74 +116,50 @@ var __hasProp = {}.hasOwnProperty;
     }
     return elements;
   };
-  Dag2.prototype.minUpperBound = function(xs) {
-    var candidate, candidates, child, key, node, parent, x, _i, _j, _len, _len1, _ref, _ref1;
-    candidates = Object.create(null);
+  Dag.prototype.whereAllParentsIn = function(xs) {
+    var allParentsIn, child, k, key, node, parentValue, resultSet, results, v, x, xsSet, _i, _j, _len, _len1, _ref;
+    xsSet = Object.create(null);
     for (_i = 0, _len = xs.length; _i < _len; _i++) {
       x = xs[_i];
+      xsSet[x] = true;
+    }
+    resultSet = Object.create(null);
+    for (_j = 0, _len1 = xs.length; _j < _len1; _j++) {
+      x = xs[_j];
       node = this.nodes[x];
       if (node == null) {
-        throw new Error("searching minUpperBound of `" + x + "` which is not in graph");
+        throw new Error("searching whereAllParentsIn of `" + x + "` which is not in graph");
       }
       _ref = node.children;
       for (key in _ref) {
         child = _ref[key];
-        candidates[child.value] = child;
-      }
-    }
-    for (_j = 0, _len1 = xs.length; _j < _len1; _j++) {
-      x = xs[_j];
-      if (candidates[x]) {
-        delete candidates[x];
-      }
-    }
-    for (key in candidates) {
-      candidate = candidates[key];
-      _ref1 = candidate.parents;
-      for (key in _ref1) {
-        parent = _ref1[key];
-        if (candidates[parent.value] != null) {
-          delete candidates[candidate.value];
-          break;
+        if (resultSet[key] != null) {
+          continue;
         }
-      }
-    }
-    return Object.keys(candidates);
-  };
-  Dag2.prototype.maxLowerBound = function(xs) {
-    var candidate, candidates, child, key, node, x, _i, _j, _len, _len1, _ref, _ref1;
-    candidates = Object.create(null);
-    for (_i = 0, _len = xs.length; _i < _len; _i++) {
-      x = xs[_i];
-      node = this.nodes[x];
-      if (node == null) {
-        throw new Error("searching maxLowerBound of `" + x + "` which is not in graph");
-      }
-      _ref = node.parents;
-      for (key in _ref) {
-        child = _ref[key];
-        candidates[child.value] = child;
-      }
-    }
-    for (_j = 0, _len1 = xs.length; _j < _len1; _j++) {
-      x = xs[_j];
-      if (candidates[x]) {
-        delete candidates[x];
-      }
-    }
-    for (key in candidates) {
-      candidate = candidates[key];
-      _ref1 = candidate.children;
-      for (key in _ref1) {
-        child = _ref1[key];
-        if (candidates[child.value] != null) {
-          delete candidates[candidate.value];
-          break;
+        allParentsIn = true;
+        for (parentValue in child.parents) {
+          if (xsSet[parentValue] == null) {
+            allParentsIn = false;
+            break;
+          }
         }
+        resultSet[key] = allParentsIn;
       }
     }
-    return Object.keys(candidates);
+    results = [];
+    for (k in resultSet) {
+      v = resultSet[k];
+      if (v) {
+        results.push(k);
+      }
+    }
+    return results;
   };
-  vorrang.Set = Set;
-  return vorrang.Dag = Dag2;
+  if (typeof window !== "undefined" && window !== null) {
+    return window.Vorrang = Dag;
+  } else if ((typeof module !== "undefined" && module !== null ? module.exports : void 0) != null) {
+    return module.exports = Dag;
+  } else {
+    throw new Error('either the `window` global or the `module.exports` global must be present');
+  }
 })();
