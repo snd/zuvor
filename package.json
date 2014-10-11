@@ -1,0 +1,21 @@
+{
+  "name": "vorrang",
+  "version": "0.0.1",
+  "dependencies": {
+    "mori": "0.2.9"
+  },
+  "devDependencies": {
+    "nodeunit": "0.9.0",
+    "nodeunit": "0.9.0",
+    "coffee-script": "1.8.0",
+    "bluebird": "1.0.5"
+  },
+  "scripts": {
+    "compile": "node_modules/coffee-script/bin/coffee --bare --compile --output src src/*.coffee",
+    "prepublish": "node_modules/coffee-script/bin/coffee --bare --compile --output src src/*.coffee",
+    "clean": "rm src/*.js",
+    "pretest": "node_modules/coffee-script/bin/coffee --bare --compile --output src src/*.coffee",
+    "test": "node_modules/nodeunit/bin/nodeunit test/*.coffee"
+  },
+  "main": "src/vorrang"
+}
