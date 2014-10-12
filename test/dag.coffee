@@ -166,10 +166,28 @@ module.exports =
 
       test.deepEqual [], dag.whereAllParentsIn []
       test.ok hasSameElements [2], dag.whereAllParentsIn [1]
+      test.ok hasSameElements [6, 8], dag.whereAllParentsIn [5, 3]
+      test.ok hasSameElements [7], dag.whereAllParentsIn [0, 4, 5]
+      test.ok hasSameElements [8], dag.whereAllParentsIn [3]
+      test.ok hasSameElements [9, 2, 8, 6], dag.whereAllParentsIn [1, 3, 5]
+      test.ok hasSameElements [10, 12], dag.whereAllParentsIn [2, 0, 5]
+      test.ok hasSameElements [11, 8], dag.whereAllParentsIn [3, 9]
       test.ok hasSameElements [12], dag.whereAllParentsIn [2]
-      test.ok hasSameElements [12, 13], dag.whereAllParentsIn [2, 1, 0]
-      test.ok hasSameElements [12, 14], dag.whereAllParentsIn [2, 0, 10, 7, 9]
+      test.ok hasSameElements [13, 12], dag.whereAllParentsIn [2, 1, 0]
+      test.ok hasSameElements [14, 12], dag.whereAllParentsIn [2, 0, 10, 7, 9]
       test.ok hasSameElements [15], dag.whereAllParentsIn [6, 8]
+
+      test.deepEqual [], dag.whereAllChildrenIn []
+      test.ok hasSameElements [1], dag.whereAllChildrenIn [2, 13, 9]
+      test.ok hasSameElements [2, 7], dag.whereAllChildrenIn [10, 12, 13, 14]
+      test.ok hasSameElements [3], dag.whereAllChildrenIn [9, 6, 8, 11]
+      test.ok hasSameElements [4], dag.whereAllChildrenIn [7]
+      test.ok hasSameElements [5, 4], dag.whereAllChildrenIn [10, 7, 9, 6]
+      test.ok hasSameElements [6, 8], dag.whereAllChildrenIn [15]
+      test.ok hasSameElements [7, 10], dag.whereAllChildrenIn [14]
+      test.ok hasSameElements [8, 6], dag.whereAllChildrenIn [15]
+      test.ok hasSameElements [9, 7, 10], dag.whereAllChildrenIn [11, 14]
+      test.ok hasSameElements [10, 7], dag.whereAllChildrenIn [14]
 
       test.done()
 
