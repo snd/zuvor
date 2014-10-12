@@ -158,7 +158,7 @@ do ->
     results = []
     for k, v of resultSet
       if v
-        results.push k
+        results.push this.nodes[k].value
     return results
 
   # find those elements whose children are all in xs
@@ -191,7 +191,7 @@ do ->
     results = []
     for k, v of resultSet
       if v
-        results.push k
+        results.push this.nodes[k].value
     return results
 
   ###################################################################################
