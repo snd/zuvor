@@ -139,7 +139,7 @@ module.exports =
         .before(3, 6)
         .before(3, 8)
         .before(3, 9)
-        .before(3, 10)
+        .before(3, 11)
         .before(4, 7)
         .before(5, 6)
         .before(5, 7)
@@ -161,6 +161,15 @@ module.exports =
 
       test.ok hasSameElements [0, 1, 3, 4, 5], dag.parentless()
       test.ok hasSameElements [12, 13, 14, 11, 15], dag.childless()
+
+      test.ok hasSameElements [12, 13, 14, 11, 15], dag.childless()
+
+      test.deepEqual [], dag.whereAllParentsIn []
+      test.ok hasSameElements [2], dag.whereAllParentsIn [1]
+      test.ok hasSameElements [12], dag.whereAllParentsIn [2]
+      test.ok hasSameElements [12, 13], dag.whereAllParentsIn [2, 1, 0]
+      test.ok hasSameElements [12, 14], dag.whereAllParentsIn [2, 0, 10, 7, 9]
+      test.ok hasSameElements [15], dag.whereAllParentsIn [6, 8]
 
       test.done()
 
