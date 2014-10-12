@@ -143,6 +143,9 @@ do ->
         # dont look at the same node twice
         if resultSet[key]?
           continue
+        # ignore nodes in the source set
+        if xsSet[key]?
+          continue
         allParentsIn = true
         for parentValue of child.parents
           unless xsSet[parentValue]?
@@ -172,6 +175,9 @@ do ->
       for key, parent of node.parents
         # dont look at the same node twice
         if resultSet[key]?
+          continue
+        # ignore nodes in the source set
+        if xsSet[key]?
           continue
         allChildrenIn = true
         for childValue of parent.children

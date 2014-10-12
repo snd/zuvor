@@ -28,12 +28,13 @@ module.exports =
 
       test.done()
 
-    'one relation: a -> b': (test) ->
+    'a -> b': (test) ->
       dag = new Vorrang()
         .before('a', 'b')
 
       test.ok dag.isIn 'a'
       test.ok dag.isIn 'b'
+
       test.ok dag.isBefore 'a', 'b'
       test.ok not dag.isBefore 'b', 'a'
 
@@ -46,9 +47,13 @@ module.exports =
       test.deepEqual ['b'], dag.whereAllParentsIn ['a']
       test.deepEqual [], dag.whereAllParentsIn ['b']
 
+      test.deepEqual [], dag.whereAllChildrenIn []
+      test.deepEqual [], dag.whereAllChildrenIn ['a']
+      test.deepEqual ['a'], dag.whereAllChildrenIn ['b']
+
       test.done()
 
-    'transitive relation: a -> b, b -> c': (test) ->
+    'a -> b, b -> c (transitive)': (test) ->
       dag = new Vorrang()
         .before('a', 'b')
         .before('b', 'c')
@@ -56,6 +61,7 @@ module.exports =
       test.ok dag.isIn 'a'
       test.ok dag.isIn 'b'
       test.ok dag.isIn 'c'
+
       test.ok dag.isBefore 'a', 'b'
       test.ok not dag.isBefore 'b', 'a'
       test.ok dag.isBefore 'b', 'c'
@@ -73,6 +79,47 @@ module.exports =
       test.deepEqual ['b'], dag.whereAllParentsIn ['a']
       test.deepEqual ['c'], dag.whereAllParentsIn ['b']
       test.deepEqual [], dag.whereAllParentsIn ['c']
+
+      test.deepEqual [], dag.whereAllChildrenIn []
+      test.deepEqual [], dag.whereAllChildrenIn ['a']
+      test.deepEqual ['a'], dag.whereAllChildrenIn ['b']
+      test.deepEqual ['b'], dag.whereAllChildrenIn ['c']
+
+      test.done()
+
+    'a -> b, b -> c, a -> c': (test) ->
+      dag = new Vorrang()
+        .before('a', 'b')
+        .before('b', 'c')
+        .before('a', 'c')
+
+      test.ok dag.isIn 'a'
+      test.ok dag.isIn 'b'
+      test.ok dag.isIn 'c'
+
+      test.ok dag.isBefore 'a', 'b'
+      test.ok not dag.isBefore 'b', 'a'
+      test.ok dag.isBefore 'b', 'c'
+      test.ok not dag.isBefore 'c', 'b'
+      test.ok dag.isBefore 'a', 'c'
+      test.ok not dag.isBefore 'c', 'a'
+
+      test.ok hasSameElements ['b', 'a', 'c'], dag.elements()
+
+      test.deepEqual ['a'], dag.parentless()
+      test.deepEqual ['c'], dag.childless()
+
+      test.deepEqual [], dag.whereAllParentsIn []
+      test.deepEqual ['b'], dag.whereAllParentsIn ['a']
+      test.deepEqual [], dag.whereAllParentsIn ['b']
+      test.deepEqual ['c'], dag.whereAllParentsIn ['b', 'a']
+      test.deepEqual [], dag.whereAllParentsIn ['c']
+
+      test.deepEqual [], dag.whereAllChildrenIn []
+      test.deepEqual [], dag.whereAllChildrenIn ['a']
+      test.deepEqual [], dag.whereAllChildrenIn ['b']
+      test.deepEqual ['a'], dag.whereAllChildrenIn ['b', 'c']
+      test.deepEqual ['b'], dag.whereAllChildrenIn ['c']
 
       test.done()
 
@@ -135,5 +182,16 @@ module.exports =
         test.ok false
       catch e
         test.equal e.message, 'searching whereAllParentsIn of `a` which is not in graph'
+
+      test.done()
+
+    'whereAllChildrenIn with element that is not in graph': (test) ->
+      dag = new Vorrang()
+
+      try
+        dag.whereAllChildrenIn ['a']
+        test.ok false
+      catch e
+        test.equal e.message, 'searching whereAllChildrenIn of `a` which is not in graph'
 
       test.done()
