@@ -123,6 +123,47 @@ module.exports =
 
       test.done()
 
+    'large graph': (test) ->
+      # taken from http://stackoverflow.com/a/12790718
+      dag = new Vorrang()
+        .before(0, 7)
+        .before(0, 10)
+        .before(0, 13)
+        .before(1, 2)
+        .before(1, 9)
+        .before(1, 13)
+        .before(2, 10)
+        .before(2, 12)
+        .before(2, 13)
+        .before(2, 14)
+        .before(3, 6)
+        .before(3, 8)
+        .before(3, 9)
+        .before(3, 10)
+        .before(4, 7)
+        .before(5, 6)
+        .before(5, 7)
+        .before(5, 9)
+        .before(5, 10)
+        .before(6, 15)
+        .before(7, 14)
+        .before(8, 15)
+        .before(9, 11)
+        .before(9, 14)
+        .before(10, 14)
+
+      numbers = [0..15]
+      for number in numbers
+        test.ok dag.isIn number
+      test.ok not dag.isIn 16
+
+      test.ok hasSameElements numbers, dag.elements()
+
+      test.ok hasSameElements [0, 1, 3, 4, 5], dag.parentless()
+      test.ok hasSameElements [12, 13, 14, 11, 15], dag.childless()
+
+      test.done()
+
   'failures':
 
     'keep it irreflexive: can not set a -> a': (test) ->
