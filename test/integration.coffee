@@ -1,78 +1,126 @@
+Promise = require 'bluebird'
 
-  ###################################################################################
-  # task example
+new Vorrang = require '../src/vorrang'
 
-  'task example': (test) ->
+module.exports =
 
-    started = mori.set()
-    completed = mori.set()
+  'systems are started and stopped in the most efficient order': (test) ->
 
-    callbacks =
-      worker: () ->
-        console.log 'stopping worker'
-        Promise.delay 100, 5
-      postgres: () ->
-        console.log 'stopping postgres'
-        Promise.delay 100, 5
-      server: () ->
-        console.log 'stopping server'
-        Promise.delay 100, 5
-      redis: () ->
-        console.log 'stopping redis'
-        Promise.delay 100, 5
+    ###################################################################################
+    # services
 
-    poset = mori.pipeline(
-      vorrang.poset()
-      # shutdown worker before shutting down postgres
-      mori.curry(vorrang.setLower, 'worker', 'postgres')
-      # shutdown server before shutting down postgres
-      mori.curry(vorrang.setLower, 'server', 'postgres')
-      # shutdown server before shutting down redis
-      mori.curry(vorrang.setLower, 'server', 'redis')
-    )
+    services =
+      redisOne:
+        start: -> Promise.delay(100)
+        stop: -> Promise.delay(100)
+      redisTwo:
+        start: -> Promise.delay(100)
+        stop: -> Promise.delay(100)
+      serverOne:
+        start: -> Promise.delay(100)
+        stop: -> Promise.delay(100)
+      serverTwo:
+        start: -> Promise.delay(100)
+        stop: -> Promise.delay(100)
+      serverThree:
+        start: -> Promise.delay(100)
+        stop: -> Promise.delay(100)
+      elasticSearch:
+        start: -> Promise.delay(100)
+        stop: -> Promise.delay(100)
+      mailAPI:
+        start: -> Promise.delay(100)
+        stop: -> Promise.delay(100)
+      cache:
+        start: -> Promise.delay(100)
+        stop: -> Promise.delay(100)
+      postgres:
+        start: -> Promise.delay(100)
+        stop: -> Promise.delay(100)
+      loadBalancer:
+        start: -> Promise.delay(100)
+        stop: -> Promise.delay(100)
+      workerOne:
+        start: -> Promise.delay(100)
+        stop: -> Promise.delay(100)
+      workerTwo:
+        start: -> Promise.delay(100)
+        stop: -> Promise.delay(100)
+
+    ###################################################################################
+    # graph
+
+    dag = new Vorrang()
+      .before('redisOne', 'cache')
+      .before('redisTwo', 'cache')
+
+      .before('cache', 'serverOne')
+      .before('cache', 'serverTwo')
+      .before('cache', 'serverThree')
+
+      .before('postgres', 'serverOne')
+      .before('postgres', 'serverTwo')
+      .before('postgres', 'serverThree')
+
+      .before('elasticSearch', 'serverOne')
+      .before('elasticSearch', 'serverTwo')
+      .before('elasticSearch', 'serverThree')
+
+      .before('elasticSearch', 'workerOne')
+      .before('elasticSearch', 'workerTwo')
+
+      .before('postgres', 'workerOne')
+      .before('postgres', 'workerTwo')
+
+      .before('mailAPI', 'workerOne')
+      .before('mailAPI', 'workerTwo')
+
+      .before('serverOne', 'loadBalancer')
+      .before('serverTwo', 'loadBalancer')
+      .before('serverThree', 'loadBalancer')
+
+    ###################################################################################
+    # start & stop
+
+    starting = []
+    running = []
+    stopping = []
+    stopped = []
 
     start = (names) ->
-      console.log 'call', names
-      iterator = (name) ->
-        if mori.get(called, name)?
-          throw new Error "can not call what is already called: #{name}"
-        if mori.get(stopped, name)?
-          throw new Error "can not call what is already stopped: #{name}"
-        callback = callbacks[name]
-        unless callback?
-          throw new Error "no callback for: #{name}"
+      Promise.all names.map (name) ->
+        if name in starting or name in running
+          return
+        console.log('starting: ' + name)
+        callback = services[name].start
+        promise = Promise.resolve(callback())
+        starting.push(name)
+        promise.then ->
+          console.log('running:  ' + name)
+          running.push(name)
+          start dag.whereAllParentsIn(running)
+
+    stop = (names) ->
+      return Promise.all names.map (name) ->
+        if name in stopping or name in stopped
+          return
+        console.log('stopping: ' + name)
+        callback = services[name].stop
         promise = Promise.resolve callback()
-        return promise.then ->
-          console.log name, 'is now stopped'
-          # the service is now stopped
-          stopped = mori.conj stopped, name
-          return stop()
-      Promise.all mori.into_array mori.map iterator, names
+        stopping.push(name)
+        promise.then ->
+          console.log('stopped:  ' + name)
+          stopped.push(name)
+          stop dag.whereAllChildrenIn(stopped)
 
-    console.log poset
+    start(dag.parentless())
+      .then ->
+        # TODO assert that all are really running
+        console.log('running:  ALL')
+        Promise.delay(1000)
+      .then ->
+        stop dag.childless()
+      .then ->
+        console.log('stopped:  ALL')
+        test.done()
 
-    stop = ->
-      console.log 'stop'
-      console.log 'called', called
-      console.log 'stopped', stopped
-      noneCalledYet = mori.is_empty(called)
-      if noneCalledYet
-        # we are just getting started
-        minElements = vorrang.minElements poset
-        console.log 'minElements', minElements
-        promise = call minElements
-        # remember that we called those names
-        called = mori.into called, minElements
-        return promise
-
-      minUpperBound = vorrang.minUpperBound poset, stopped
-      console.log 'minUpperBound', minUpperBound
-      # do not call any that have already been called
-      nowReadyAndNotYetCalled = mori.difference minUpperBound, called
-      promise = call nowReadyAndNotYetCalled
-      # remember that we called those names
-      called = mori.into called, nowReadyAndNotYetCalled
-      return promise
-
-    stop().then ->
-      test.done()
