@@ -105,7 +105,10 @@ do ->
 
   # O(n)
   Dag.prototype.elements = ->
-    Object.keys(this.nodes)
+    elements = []
+    for key,node of this.nodes
+      elements.push node.value
+    return elements
 
   # elements without parents
   # O(n)
