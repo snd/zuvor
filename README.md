@@ -14,9 +14,6 @@
   - good short description
   - good longer description
 
-- best practices
-  - package.json
-
 - example.js
 
 - push
@@ -30,10 +27,9 @@
 [![Dependencies](https://david-dm.org/snd/vorrang.svg)](https://david-dm.org/snd/vorrang)
 
 > simple and reasonably fast implementation of directed acyclic graphs and sets
-> with focus on finding the fastest execution order of interdependent tasks
-
-> vorrang is a simple and reasonably fast implementation of DAGs (directed acyclic graphs) OR strict posets (partially ordered sets) for nodejs and the browser
-with a focus on finding the optimal (shortest) execution order of tasks that depend on each others completion and whose completion time is not known ahead of time.
+> that provide the building blocks for
+> dynamically finding the optimal execution order every time a set of interdependent tasks with
+> varying execution times is run
 
 ### why?
 
@@ -145,4 +141,4 @@ downstream
 
 ### how can i contribute?
 
-## license: MIT
+## [license: MIT](LICENSE)
