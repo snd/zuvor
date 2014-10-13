@@ -1,16 +1,27 @@
-# vorrang
+# zuvor
 
 ## TODO
 
-- use real world tasks in example
-- write example
-- implement minUpperBound
-- write task example test
+- integration test: tasks are executed in the right order
+  - draw the graph
+  - devise an interesting timing
+  - add assertions for the correct run (in the callbacks)
+  - add test.expect
 
-- better name: ideas: vor
-- best practices
+- clean up naming/terminology
+
 - finish readme
-- clean up terminology
+  - good short description
+  - good longer description
+
+- best practices
+  - package.json
+
+- example.js
+
+- push
+- make sure travis is working
+- npm publish
 
 ---
 
@@ -18,9 +29,13 @@
 [![Build Status](https://travis-ci.org/snd/vorrang.svg?branch=master)](https://travis-ci.org/snd/vorrang/branches)
 [![Dependencies](https://david-dm.org/snd/vorrang.svg)](https://david-dm.org/snd/vorrang)
 
-> vorrang is a simple and reasonably fast implementation of DAGs (directed acyclic graphs) / strict posets (partially ordered sets) for nodejs and the browser
+> simple and reasonably fast implementation of directed acyclic graphs and sets
+> with focus on finding the fastest execution order of interdependent tasks
 
-#### ~~ VORRANG IS A WORK IN PROGRESS ~~
+> vorrang is a simple and reasonably fast implementation of DAGs (directed acyclic graphs) OR strict posets (partially ordered sets) for nodejs and the browser
+with a focus on finding the optimal (shortest) execution order of tasks that depend on each others completion and whose completion time is not known ahead of time.
+
+### why?
 
 i had a list of tasks where some tasks needed to run before other tasks.
 for example: `A before B`, `C before A`, `D before B`, ...
@@ -31,20 +46,30 @@ i built *vorrang* to model and query the underlying [partial order](http://en.wi
 
 browser?
 
+vorrang can be used to model
+
+- shutdown orders
+- task orders
+- class hierarchies
+- ancestor relationships
+- taxonomies
+- partial orders
+- event orders
+- production chains
+- dependency graphs
+- ...
 
 
 no dependencies
-
-only works for strings
 
 first let's model the task order:
 
 only works with strings
 
 ```javascript
-var vorrang = require('vorrang');
+var Vorrang = require('vorrang');
 
-var dag = new vorrang.Dag()
+var dag = new Vorrang()
   .before('A', 'B')
   .before('C', 'A')
   .before('D', 'B');
@@ -74,28 +99,14 @@ you get the idea...
 
 ### API
 
-### get it
-
-
-it uses mori
-
-because of mori you can use sets as nodes [example]
-
-example folder
-
-functional api
-
-this is ultimately a tradeoff between space and speed
-
 ### what can i do with it?
 
 
 ### is it stable?
 
-testsuite
+it has a large testsuite.
 
-bugs
-
+there are probably bugs.
 
 not fast for graphs with very long chains.
 
@@ -107,7 +118,12 @@ i chose the data types carefully.
 its fast enough for my use case.
 its probably fast enough for your use case.
 
-if you need it to be faster definitely let me know!
+if you need something faster and have an idea definitely send me an email or make an issue.
+
+query performance
+memory usage
+
+it currently uses too much memory
 
 ### how is it implemented?
 
@@ -127,78 +143,6 @@ upstream
 downstream
 ```
 
-# v1
-
-```javascript
-{
-  a: new Set
-  b: new Set
-}
-```
-
-# v2
-
-```javascript
-{
-  a: {
-    in: new Set
-    out: new Set
-  }
-  b: {
-    in: new Set
-    out: new Set
-  }
-}
-```
-
-# v3
-
-- less storage than v2
-
-following an edge is just one property access
-
-```javascript
-{
-  in: {
-    a: new Set
-    b:
-  }
-  out: {
-    a:
-    b:
-  }
-}
-```
-
-# v4
-
-```javascript
-{
-  a: {
-    value: 'a'
-    in: {
-      b: link to the node of b
-    }
-    out: {
-
-    }
-  b: new Node
-}
-```
-
-min upper bound of a set S:
-  put all outgoing of S into a set C
-  loop through the list
-  for all X in C:
-    if any of X.in is in C
-      remove X from C
-  return C
-
-"where none in the set has incoming edges from any in the set"
-
-test it with a scenario where a -> b, a -> c, c -> b (only c is min upper bound of #{a})
-
-maxLowerBound of a set S:
-analog
+### how can i contribute?
 
 ## license: MIT

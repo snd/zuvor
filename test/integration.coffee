@@ -1,6 +1,9 @@
 Promise = require 'bluebird'
 
-new Vorrang = require '../src/vorrang'
+{Dag, Set} = require('../src/zuvor')
+
+###################################################################################
+# test
 
 module.exports =
 
@@ -11,46 +14,106 @@ module.exports =
 
     services =
       redisOne:
-        start: -> Promise.delay(100)
-        stop: -> Promise.delay(100)
+        start: ->
+          test.ok starting.isEqual(
+            new Set(['redisOne', 'redisTwo', 'postgres', 'elasticSearch', 'mailAPI'])
+          )
+          test.ok running.isEqual(
+            new Set
+          )
+          Promise.delay(10)
+        stop: ->
+          Promise.delay(100)
       redisTwo:
-        start: -> Promise.delay(100)
-        stop: -> Promise.delay(100)
+        start: ->
+          test.ok starting.isEqual(
+            new Set(['redisOne', 'redisTwo', 'postgres', 'elasticSearch', 'mailAPI'])
+          )
+          test.ok running.isEqual(
+            new Set
+          )
+          Promise.delay(20)
+        stop: ->
+          Promise.delay(100)
       serverOne:
-        start: -> Promise.delay(100)
-        stop: -> Promise.delay(100)
+        start: ->
+          Promise.delay(100)
+        stop: ->
+          Promise.delay(100)
       serverTwo:
-        start: -> Promise.delay(100)
-        stop: -> Promise.delay(100)
+        start: ->
+          Promise.delay(100)
+        stop: ->
+          Promise.delay(100)
       serverThree:
-        start: -> Promise.delay(100)
-        stop: -> Promise.delay(100)
+        start: ->
+          Promise.delay(100)
+        stop: ->
+          Promise.delay(100)
       elasticSearch:
-        start: -> Promise.delay(100)
-        stop: -> Promise.delay(100)
+        start: ->
+          test.ok starting.isEqual(
+            new Set(['redisOne', 'redisTwo', 'postgres', 'elasticSearch', 'mailAPI'])
+          )
+          test.ok running.isEqual(
+            new Set
+          )
+          Promise.delay(100)
+        stop: ->
+          Promise.delay(100)
       mailAPI:
-        start: -> Promise.delay(100)
-        stop: -> Promise.delay(100)
+        start: ->
+          test.ok starting.isEqual(
+            new Set(['redisOne', 'redisTwo', 'postgres', 'elasticSearch', 'mailAPI'])
+          )
+          test.ok running.isEqual(
+            new Set
+          )
+          Promise.delay(100)
+        stop: ->
+          Promise.delay(100)
       cache:
-        start: -> Promise.delay(100)
-        stop: -> Promise.delay(100)
+        start: ->
+          test.ok starting.isEqual(
+            new Set(['postgres', 'elasticSearch', 'mailAPI', 'cache'])
+          )
+          test.ok running.isEqual(
+            new Set(['redisOne', 'redisTwo'])
+          )
+          Promise.delay(100)
+        stop: ->
+          Promise.delay(100)
       postgres:
-        start: -> Promise.delay(100)
-        stop: -> Promise.delay(100)
+        start: ->
+          test.ok starting.isEqual(
+            new Set(['redisOne', 'redisTwo', 'postgres', 'elasticSearch', 'mailAPI'])
+          )
+          test.ok running.isEqual(
+            new Set
+          )
+          Promise.delay(100)
+        stop: ->
+          Promise.delay(100)
       loadBalancer:
-        start: -> Promise.delay(100)
-        stop: -> Promise.delay(100)
+        start: ->
+          Promise.delay(100)
+        stop: ->
+          Promise.delay(100)
       workerOne:
-        start: -> Promise.delay(100)
-        stop: -> Promise.delay(100)
+        start: ->
+          Promise.delay(100)
+        stop: ->
+          Promise.delay(100)
       workerTwo:
-        start: -> Promise.delay(100)
-        stop: -> Promise.delay(100)
+        start: ->
+          Promise.delay(100)
+        stop: ->
+          Promise.delay(100)
 
     ###################################################################################
     # graph
 
-    dag = new Vorrang()
+    dag = new Dag()
       .before('redisOne', 'cache')
       .before('redisTwo', 'cache')
 
@@ -82,45 +145,51 @@ module.exports =
     ###################################################################################
     # start & stop
 
-    starting = []
-    running = []
-    stopping = []
-    stopped = []
+    starting = new Set
+    running = new Set
+    stopping = new Set
+    stopped = new Set
 
     start = (names) ->
+      console.log('starting:', names)
+      starting.add names
       Promise.all names.map (name) ->
-        if name in starting or name in running
-          return
-        console.log('starting: ' + name)
         callback = services[name].start
         promise = Promise.resolve(callback())
-        starting.push(name)
         promise.then ->
           console.log('running:  ' + name)
-          running.push(name)
-          start dag.whereAllParentsIn(running)
+          starting.remove name
+          running.add name
+          # start all we can start now that have not been started
+          toStart = new Set(dag.whereAllParentsIn(running.elements()))
+            .remove(starting)
+            .remove(running)
+            .elements()
+          start toStart
 
     stop = (names) ->
+      console.log('stopping: ', names)
+      stopping.add names
       return Promise.all names.map (name) ->
-        if name in stopping or name in stopped
-          return
-        console.log('stopping: ' + name)
         callback = services[name].stop
         promise = Promise.resolve callback()
-        stopping.push(name)
         promise.then ->
           console.log('stopped:  ' + name)
-          stopped.push(name)
-          stop dag.whereAllChildrenIn(stopped)
+          stopping.remove name
+          stopped.add name
+          # stop all we can stop now that have not been stopped
+          toStop = new Set(dag.whereAllChildrenIn(stopped.elements()))
+            .remove(stopping)
+            .remove(stopped)
+            .elements()
+          stop toStop
 
     start(dag.parentless())
       .then ->
-        # TODO assert that all are really running
-        console.log('running:  ALL')
-        Promise.delay(1000)
-      .then ->
+        test.ok running.isEqual new Set Object.keys(services)
+        test.ok starting.isEqual new Set
         stop dag.childless()
       .then ->
-        console.log('stopped:  ALL')
+        test.ok stopped.isEqual new Set Object.keys(services)
+        test.ok stopping.isEqual new Set
         test.done()
-

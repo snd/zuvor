@@ -1,11 +1,11 @@
 var assert = require('assert');
-var Vorrang = require('./src/vorrang');
+var Dag = require('../src/zuvor').Dag;
 
 var benchmark = function(n) {
   console.log('# n = ' + n + '\n');
 
   console.time('before');
-  var dag = new Vorrang();
+  var dag = new Dag();
   for(i = 1; i < n; i++) {
     dag.before(i, i + 1);
   }

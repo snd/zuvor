@@ -1,14 +1,47 @@
 {
-  "name": "vorrang",
+  "name": "zuvor",
   "version": "0.0.1",
+  "description": "simple and reasonably fast implementation of directed acyclic graphs and sets with focus on finding the fastest execution order of interdependent tasks",
+  "keywords": [
+    "dag",
+    "directed",
+    "acyclic",
+    "graph",
+    "poset",
+    "partially",
+    "ordered",
+    "set",
+    "strict",
+    "partial",
+    "order"
+  ],
+  "homepage": "http://github.com/snd/zuvor",
+  "author": {
+    "name": "Maximilian Krüger",
+    "email": "kruemaxi@gmail.com",
+    "url": "http://github.com/snd"
+  },
+  "bugs": {
+    "url": "http://github.com/snd/zuvor/issues",
+    "email": "kruemaxi@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/snd/zuvor.git"
+  },
+  "licenses": {
+    "type": "MIT",
+    "url": "git://github.com/snd/zuvor/LICENSE"
+  },
+  "engines": {
+    "node": ">=0.8.0"
+  },
   "dependencies": {
-    "mori": "0.2.9"
   },
   "devDependencies": {
     "nodeunit": "0.9.0",
-    "nodeunit": "0.9.0",
     "coffee-script": "1.8.0",
-    "bluebird": "1.0.5"
+    "bluebird": "2.3.5"
   },
   "scripts": {
     "compile": "node_modules/coffee-script/bin/coffee --bare --compile --output src src/*.coffee",
@@ -17,5 +50,5 @@
     "pretest": "node_modules/coffee-script/bin/coffee --bare --compile --output src src/*.coffee",
     "test": "node_modules/nodeunit/bin/nodeunit test/*.coffee"
   },
-  "main": "src/vorrang"
+  "main": "src/zuvor"
 }

@@ -1,6 +1,4 @@
-Promise = require 'bluebird'
-
-new Vorrang = require '../src/vorrang'
+Dag = require('../src/zuvor').Dag
 
 hasSameElements = (as, bs) ->
   if as.length isnt bs.length
@@ -15,7 +13,7 @@ module.exports =
   'scenarios':
 
     'zero elements': (test) ->
-      dag = new Vorrang()
+      dag = new Dag
 
       test.ok not dag.isIn 'a', 'b'
 
@@ -29,7 +27,7 @@ module.exports =
       test.done()
 
     'a -> b': (test) ->
-      dag = new Vorrang()
+      dag = new Dag()
         .before('a', 'b')
 
       test.ok dag.isIn 'a'
@@ -54,7 +52,7 @@ module.exports =
       test.done()
 
     'a -> b, b -> c (transitive)': (test) ->
-      dag = new Vorrang()
+      dag = new Dag()
         .before('a', 'b')
         .before('b', 'c')
 
@@ -88,7 +86,7 @@ module.exports =
       test.done()
 
     'a -> b, b -> c, a -> c': (test) ->
-      dag = new Vorrang()
+      dag = new Dag()
         .before('a', 'b')
         .before('b', 'c')
         .before('a', 'c')
@@ -125,7 +123,7 @@ module.exports =
 
     'large graph': (test) ->
       # taken from http://stackoverflow.com/a/12790718
-      dag = new Vorrang()
+      dag = new Dag()
         .before(0, 7)
         .before(0, 10)
         .before(0, 13)
@@ -194,7 +192,7 @@ module.exports =
   'failures':
 
     'keep it irreflexive: can not set a -> a': (test) ->
-      dag = new Vorrang()
+      dag = new Dag()
       try
         dag.before 'b', 'b'
         test.ok false
@@ -203,7 +201,7 @@ module.exports =
       test.done()
 
     'keep it cycle free: can not set a -> b and b -> a': (test) ->
-      dag = new Vorrang()
+      dag = new Dag()
         .before('a', 'b')
 
       try
@@ -214,7 +212,7 @@ module.exports =
       test.done()
 
     'keep it cycle free for transitive: can not set c -> a if a -> b and b -> c': (test) ->
-      dag = new Vorrang()
+      dag = new Dag()
         .before('a', 'b')
         .before('b', 'c')
 
@@ -226,7 +224,7 @@ module.exports =
       test.done()
 
     'not a string or number': (test) ->
-      dag = new Vorrang()
+      dag = new Dag()
 
       try
         dag.before {}, 'b'
@@ -243,7 +241,7 @@ module.exports =
       test.done()
 
     'whereAllParentsIn with element that is not in graph': (test) ->
-      dag = new Vorrang()
+      dag = new Dag()
 
       try
         dag.whereAllParentsIn ['a']
@@ -254,7 +252,7 @@ module.exports =
       test.done()
 
     'whereAllChildrenIn with element that is not in graph': (test) ->
-      dag = new Vorrang()
+      dag = new Dag()
 
       try
         dag.whereAllChildrenIn ['a']

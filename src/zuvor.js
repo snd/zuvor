@@ -2,7 +2,7 @@
 var __hasProp = {}.hasOwnProperty;
 
 (function() {
-  var Dag, Node, isObjectEmpty;
+  var Dag, Node, Set, isObjectEmpty, zuvor;
   isObjectEmpty = function(x) {
     var v;
     for (v in x) {
@@ -10,6 +10,103 @@ var __hasProp = {}.hasOwnProperty;
       return false;
     }
     return true;
+  };
+  Set = function(other) {
+    this._map = Object.create(null);
+    this.length = 0;
+    if (other != null) {
+      this.add(other);
+    }
+    return this;
+  };
+  Set.prototype = {
+    isIn: function(x) {
+      return this._map[x] != null;
+    },
+    isEmpty: function() {
+      return this.length === 0;
+    },
+    isEqual: function(other) {
+      var that;
+      that = this;
+      return that.length === other.length && other.elements().every(function(x) {
+        return that.isIn(x);
+      });
+    },
+    toString: function() {
+      return '#{' + Object.keys(this._map).join(' ') + '}';
+    },
+    elements: function() {
+      var elements, k, v, _ref;
+      elements = [];
+      _ref = this._map;
+      for (k in _ref) {
+        v = _ref[k];
+        if (v) {
+          elements.push(k);
+        }
+      }
+      return elements;
+    },
+    add: function(other) {
+      var key, type, v, _i, _len;
+      type = typeof other;
+      if (type === 'string' || type === 'number') {
+        if (!this.isIn(other)) {
+          this._map[other] = true;
+          this.length++;
+        }
+      } else if (other instanceof Set) {
+        for (key in other._map) {
+          if (!this.isIn(key)) {
+            this._map[key] = true;
+            this.length++;
+          }
+        }
+      } else if (Array.isArray(other)) {
+        for (_i = 0, _len = other.length; _i < _len; _i++) {
+          v = other[_i];
+          if (!this.isIn(v)) {
+            this._map[v] = true;
+            this.length++;
+          }
+        }
+      } else {
+        throw new TypeError('unsupported argument type');
+      }
+      return this;
+    },
+    remove: function(other) {
+      var key, type, v, _i, _len;
+      type = typeof other;
+      if (type === 'string' || type === 'number') {
+        if (this.isIn(other)) {
+          this._map[other] = void 0;
+          this.length--;
+        }
+      } else if (other instanceof Set) {
+        for (key in other._map) {
+          if (this.isIn(key)) {
+            this._map[key] = void 0;
+            this.length--;
+          }
+        }
+      } else if (Array.isArray(other)) {
+        for (_i = 0, _len = other.length; _i < _len; _i++) {
+          v = other[_i];
+          if (this.isIn(v)) {
+            this._map[v] = void 0;
+            this.length--;
+          }
+        }
+      } else {
+        throw new TypeError('unsupported argument type');
+      }
+      return this;
+    },
+    clone: function() {
+      return new Set(this);
+    }
   };
   Node = function(value) {
     this.value = value;
@@ -90,7 +187,14 @@ var __hasProp = {}.hasOwnProperty;
     return false;
   };
   Dag.prototype.elements = function() {
-    return Object.keys(this.nodes);
+    var elements, key, node, _ref;
+    elements = [];
+    _ref = this.nodes;
+    for (key in _ref) {
+      node = _ref[key];
+      elements.push(node.value);
+    }
+    return elements;
   };
   Dag.prototype.parentless = function() {
     var elements, key, node, _ref;
@@ -136,6 +240,9 @@ var __hasProp = {}.hasOwnProperty;
         if (resultSet[key] != null) {
           continue;
         }
+        if (xsSet[key] != null) {
+          continue;
+        }
         allParentsIn = true;
         for (parentValue in child.parents) {
           if (xsSet[parentValue] == null) {
@@ -150,15 +257,61 @@ var __hasProp = {}.hasOwnProperty;
     for (k in resultSet) {
       v = resultSet[k];
       if (v) {
-        results.push(k);
+        results.push(this.nodes[k].value);
       }
     }
     return results;
   };
+  Dag.prototype.whereAllChildrenIn = function(xs) {
+    var allChildrenIn, childValue, k, key, node, parent, resultSet, results, v, x, xsSet, _i, _j, _len, _len1, _ref;
+    xsSet = Object.create(null);
+    for (_i = 0, _len = xs.length; _i < _len; _i++) {
+      x = xs[_i];
+      xsSet[x] = true;
+    }
+    resultSet = Object.create(null);
+    for (_j = 0, _len1 = xs.length; _j < _len1; _j++) {
+      x = xs[_j];
+      node = this.nodes[x];
+      if (node == null) {
+        throw new Error("searching whereAllChildrenIn of `" + x + "` which is not in graph");
+      }
+      _ref = node.parents;
+      for (key in _ref) {
+        parent = _ref[key];
+        if (resultSet[key] != null) {
+          continue;
+        }
+        if (xsSet[key] != null) {
+          continue;
+        }
+        allChildrenIn = true;
+        for (childValue in parent.children) {
+          if (xsSet[childValue] == null) {
+            allChildrenIn = false;
+            break;
+          }
+        }
+        resultSet[key] = allChildrenIn;
+      }
+    }
+    results = [];
+    for (k in resultSet) {
+      v = resultSet[k];
+      if (v) {
+        results.push(this.nodes[k].value);
+      }
+    }
+    return results;
+  };
+  zuvor = {
+    Dag: Dag,
+    Set: Set
+  };
   if (typeof window !== "undefined" && window !== null) {
-    return window.Vorrang = Dag;
+    return window.zuvor = zuvor;
   } else if ((typeof module !== "undefined" && module !== null ? module.exports : void 0) != null) {
-    return module.exports = Dag;
+    return module.exports = zuvor;
   } else {
     throw new Error('either the `window` global or the `module.exports` global must be present');
   }

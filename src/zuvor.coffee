@@ -10,6 +10,88 @@ do ->
     return true
 
   ###################################################################################
+  # set
+
+  Set = (other) ->
+    # create a new object that doesn't inherit any properties from Object
+    this._map = Object.create(null)
+    this.length = 0
+    if other?
+      this.add other
+    return this
+
+  Set.prototype =
+    # O(1)
+    isIn: (x) ->
+      this._map[x]?
+    # O(1)
+    isEmpty: ->
+      this.length is 0
+    # O(1) best case. O(n) worst case.
+    isEqual: (other) ->
+      that = this
+      that.length is other.length and other.elements().every (x) ->
+        that.isIn x
+    # O(n)
+    toString: ->
+      '#{' + Object.keys(this._map).join(' ') + '}'
+    # O(n)
+    elements: ->
+      elements = []
+      for k, v of this._map
+        if v
+          elements.push k
+      return elements
+    # O(n) where n is the amount of elements in other
+    add: (other) ->
+      type = typeof other
+      if type is 'string' or type is 'number'
+        unless this.isIn other
+          this._map[other] = true
+          this.length++
+      else if other instanceof Set
+        for key of other._map
+          unless this.isIn key
+            this._map[key] = true
+            this.length++
+      else if Array.isArray other
+        for v in other
+          unless this.isIn v
+            this._map[v] = true
+            this.length++
+      else
+        throw new TypeError 'unsupported argument type'
+      # for chaining
+      return this
+    # O(n) where n is the amount of elements in other
+    remove: (other) ->
+      type = typeof other
+      if type is 'string' or type is 'number'
+        if this.isIn other
+          # delete is dog slow
+          this._map[other] = undefined
+          this.length--
+      else if other instanceof Set
+        for key of other._map
+          if this.isIn key
+            # delete is dog slow
+            this._map[key] = undefined
+            this.length--
+      else if Array.isArray other
+        for v in other
+          if this.isIn v
+            # delete is dog slow
+            this._map[v] = undefined
+            this.length--
+      else
+        throw new TypeError 'unsupported argument type'
+      # for chaining
+      return this
+    # O(n)
+    clone: ->
+      new Set this
+
+  ###################################################################################
   # directed acyclic graph
 
   Node = (value) ->
@@ -194,12 +276,16 @@ do ->
         results.push this.nodes[k].value
     return results
 
+  zuvor =
+    Dag: Dag
+    Set: Set
+
   ###################################################################################
   # nodejs or browser?
 
   if window?
-    window.Vorrang = Dag
+    window.zuvor = zuvor
   else if module?.exports?
-    module.exports = Dag
+    module.exports = zuvor
   else
     throw new Error 'either the `window` global or the `module.exports` global must be present'
