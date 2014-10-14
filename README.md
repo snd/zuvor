@@ -32,7 +32,8 @@
 
 - [is it any good?](#is-it-any-good)
 - [how do i install it?](#how-do-i-install-it)
-- [API](#api)
+- [Set-API](#set-api)
+- [Dag-API](#dag-api)
 - [is it fast?](#is-it-fast)
 - [is it stable?](#is-it-stable)
 - [how is it implemented?](#how-is-it-implemented)
@@ -157,11 +158,9 @@ and we can discuss and how to implement it best.
 
 i appreciate it if you open an issue first before 
 
-### API
+## Set API
 
-#### set
-
-##### `new Set(Nothing or Array or Set)` -> `Set` (create a set)
+### `new Set(Nothing or Array or Set)` -> `Set` create a set
 
 ```javascript
 var emptySet = new Set();
@@ -172,7 +171,16 @@ var clonedSet = new Set(setFromArray);
 ```
 *Time complexity: O(n) where n = number of elements in argument array or set*
 
-##### `.toString()` -> `String` (returns a string representation of the set)
+### `.elements()` -> `Array` returns an array of all the elements in the set
+
+```javascript
+new Set().elements();           // -> []
+new Set([1, 2, 3]).elements();  // -> [1, 2, 3]
+```
+
+*Time complexity: O(n) where n = number of elements in the set*
+
+### `.toString()` -> `String` returns a string representation of the set
 
 ```javascript
 new Set().toString();            // -> '#{}'
@@ -181,7 +189,7 @@ new Set([1, 2, 3]).toString();   // -> '#{1 2 3}'
 
 *Time complexity: O(n) where n = number of elements in the set*
 
-##### `.isEmpty()` -> `Boolean` (returns whether set is empty)
+### `.isEmpty()` -> `Boolean` returns whether set is empty
 
 ```javascript
 new Set().isEmpty();            // -> true
@@ -190,7 +198,7 @@ new Set([1, 2, 3]).isEmpty();   // -> false
 
 *Time complexity: O(1)*
 
-##### `.isEqual(Set)` -> `Boolean` (returns whether two sets contain the same elements)
+### `.isEqual(Set)` -> `Boolean` returns whether two sets contain the same elements
 
 ```javascript
 new Set().isEqual(new Set());             // -> true
@@ -203,37 +211,78 @@ set.isEqual(new Set([1, 2, 3]));          // -> true
 set.isEqual(set);                         // -> true
 ```
 
-*Time complexity: O(n) where n = number of elements in the set*
+*Time complexity: best case: O(1). worst case: O(n) where n = number of elements in the set*
 
-##### `.clone()` -> `Set` (returns a new set that has the same elements as the original set)
-
-```javascript
-new Set().isEmpty();            // -> true
-new Set([1, 2, 3]).isEmpty();   // -> false
-```
-
-*Time complexity: O(n) where n = number of elements in the set*
-
-##### `.isIn(Value)` -> `Boolean` (check if element is in set)
+### `.isIn(Value)` -> `Boolean` returns whether a value is in the set
 
 ```javascript
 var set = new Set([1, 2, 3]);
-set.isIn(1) // -> true
-set.isIn(4) // -> false
+set.isIn(1);  // -> true
+set.isIn(4);  // -> false
 ```
 
-##### `.add(Value or Array or Set)` -> `Set` (add to a set)
+*Time complexity: O(1)*
+
+### `.add(Value or Array or Set)` -> `Set` add elements to the set
 
 ```javascript
 var set = new Set();
-set.add(1);
-set.is
-// side effects original set!
-// can be chained
 
+set.add(1);
+// add side effects original set!
+set.elements();   // -> [1]
+
+set.add([2, 3]);
+set.elements();   // -> [1, 2, 3]
+
+set.add(new Set([4, 5]));
+set.elements();   // -> [1, 2, 3, 4, 5]
+
+// remove can be chained
+set
+  .add(6)
+  .add(7)
+  .add(8);
+set.elements();   // -> [1, 2, 3, 4, 5, 6, 7, 8]
 ```
 
+*Time complexity: O(1) for a single value. O(n) for a set (array) where n = number of elements in the set (array)*
 
-#### dag
+### `.remove(Value or Array or Set)` -> `Set` remove elements from the set
+
+```javascript
+var set = new Set([1, 2, 3, 4, 5, 6, 7, 8]);
+
+set.remove(1);
+// remove side effects original set!
+set.elements();   // -> [2, 3, 4, 5, 6, 7, 8]
+
+set.remove([2, 3]);
+set.elements();   // -> [4, 5, 6, 7, 8]
+
+set.remove(new Set([4, 5]));
+set.elements();   // -> [6, 7, 8]
+
+// remove can be chained
+set
+  .remove(6)
+  .remove(7)
+  .remove(8);
+set.elements();   // -> []
+```
+
+*Time complexity: O(1) for a single value. O(n) for a set (array) where n = number of elements in the set (array)*
+
+### `.clone()` -> `Set` returns a new set that has the same elements as the original set
+
+```javascript
+var set = new Set([1, 2, 3]);
+var clone = set.clone();
+set.isEqual(clone);     // -> true
+```
+
+*Time complexity: O(n) where n = number of elements in the set*
+
+## Dag API
 
 ## [license: MIT](LICENSE)
