@@ -14,7 +14,7 @@
   - good short description
   - good longer description
 
-- example.js
+- example.js (taken from integration test)
 
 - push
 - make sure travis is working
@@ -22,14 +22,22 @@
 
 ---
 
-[![NPM version](https://badge.fury.io/js/vorrang.svg)](http://badge.fury.io/js/vorrang)
-[![Build Status](https://travis-ci.org/snd/vorrang.svg?branch=master)](https://travis-ci.org/snd/vorrang/branches)
-[![Dependencies](https://david-dm.org/snd/vorrang.svg)](https://david-dm.org/snd/vorrang)
+[![NPM version](https://badge.fury.io/js/zuvor.svg)](http://badge.fury.io/js/zuvor)
+[![Build Status](https://travis-ci.org/snd/zuvor.svg?branch=master)](https://travis-ci.org/snd/zuvor/branches)
+[![Dependencies](https://david-dm.org/snd/zuvor.svg)](https://david-dm.org/snd/zuvor)
 
-> simple and reasonably fast implementation of directed acyclic graphs and sets
-> that provide the building blocks for
-> dynamically finding the optimal execution order every time a set of interdependent tasks with
-> varying execution times is run
+> simple and reasonably fast implementation of DAGs (directed acyclic graphs) and sets
+> as building blocks for dynamically finding the optimal execution order
+> of interdependent tasks with nondeterministic execution times
+
+- [is it any good?](#is-it-any-good)
+- [how do i install it?](#how-do-i-install-it)
+- [API](#api)
+- [is it fast?](#is-it-fast)
+- [is it stable?](#is-it-stable)
+- [how is it implemented?](#how-is-it-implemented)
+- [how can i contribute?](#how-can-i-contribute)
+- [license](#license-mit)
 
 ### why?
 
@@ -39,6 +47,8 @@ for example: `A before B`, `C before A`, `D before B`, ...
 i needed a programatic way to run those tasks in the most efficient order.
 
 i built *vorrang* to model and query the underlying [partial order](http://en.wikipedia.org/wiki/Partially_ordered_set):
+
+zuvor gives to the building blocks to do exactly that.
 
 browser?
 
@@ -93,22 +103,23 @@ you get the idea...
 
 [see the full example again](example.js)
 
-### API
-
 ### what can i do with it?
 
 
 ### is it stable?
 
-it has a large testsuite.
+[![Build Status](https://travis-ci.org/snd/zuvor.svg?branch=master)](https://travis-ci.org/snd/zuvor/branches)
+
+it has a large [testsuite](test)!
 
 there are probably bugs.
 
-not fast for graphs with very long chains.
+if you find one i appreciate it if you [make an issue](https://github.com/snd/zuvor/issues/new).
 
 ### is it fast?
 
 the current focus is on functionality and correctness rather than performance.
+
 i did not optimize prematurely.
 i chose the data types carefully.
 its fast enough for my use case.
@@ -140,5 +151,26 @@ downstream
 ```
 
 ### how can i contribute?
+
+if you need a function that is not in the API just [make an issue](https://github.com/snd/zuvor/issues/new)
+and we can discuss and how to implement it best.
+
+i appreciate it if you open an issue first before 
+
+### API
+
+#### set
+
+##### create a set: `new Set`
+
+```javascript
+var emptySet = new Set;
+// or
+var setFromArray = new Set([1, 2, 3]);
+// or
+var clonedSet = new Set(setFromArray);
+```
+
+#### dag
 
 ## [license: MIT](LICENSE)
