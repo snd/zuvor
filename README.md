@@ -160,7 +160,9 @@ i appreciate it if you open an issue first before
 
 ## Set API
 
-### `new Set(Nothing or Array or Set)` -> `Set` create a set
+tries to follow the ECMA6 set api as closely as possible
+
+#### `new Set(Nothing or Array or Set)` -> `Set` create a set
 
 ```javascript
 var emptySet = new Set();
@@ -171,7 +173,16 @@ var clonedSet = new Set(setFromArray);
 ```
 *Time complexity: O(n) where n = number of elements in argument array or set*
 
-### `.elements()` -> `Array` returns an array of all the elements in the set
+#### `.size` -> `Integer` number of elements in the set
+
+```javascript
+new Set().size;           // -> 0
+new Set(1, 2, 3).size;    // -> 3
+```
+
+*Time complexity: O(1)*
+
+#### `.elements()` -> `Array` returns an array of all the elements in the set
 
 ```javascript
 new Set().elements();           // -> []
@@ -180,7 +191,7 @@ new Set([1, 2, 3]).elements();  // -> [1, 2, 3]
 
 *Time complexity: O(n) where n = number of elements in the set*
 
-### `.toString()` -> `String` returns a string representation of the set
+#### `.toString()` -> `String` returns a string representation of the set
 
 ```javascript
 new Set().toString();            // -> '#{}'
@@ -189,7 +200,7 @@ new Set([1, 2, 3]).toString();   // -> '#{1 2 3}'
 
 *Time complexity: O(n) where n = number of elements in the set*
 
-### `.isEmpty()` -> `Boolean` returns whether set is empty
+#### `.isEmpty()` -> `Boolean` returns whether the set is empty
 
 ```javascript
 new Set().isEmpty();            // -> true
@@ -198,7 +209,7 @@ new Set([1, 2, 3]).isEmpty();   // -> false
 
 *Time complexity: O(1)*
 
-### `.isEqual(Set)` -> `Boolean` returns whether two sets contain the same elements
+#### `.isEqual(Set)` -> `Boolean` returns whether two sets contain the same elements
 
 ```javascript
 new Set().isEqual(new Set());             // -> true
@@ -213,7 +224,7 @@ set.isEqual(set);                         // -> true
 
 *Time complexity: best case: O(1). worst case: O(n) where n = number of elements in the set*
 
-### `.isIn(Value)` -> `Boolean` returns whether a value is in the set
+#### `.isIn(Value)` -> `Boolean` returns whether a value is in the set
 
 ```javascript
 var set = new Set([1, 2, 3]);
@@ -223,7 +234,7 @@ set.isIn(4);  // -> false
 
 *Time complexity: O(1)*
 
-### `.add(Value or Array or Set)` -> `Set` add elements to the set
+#### `.add(Value or Array or Set)` -> `Set` add elements to the set
 
 ```javascript
 var set = new Set();
@@ -248,32 +259,32 @@ set.elements();   // -> [1, 2, 3, 4, 5, 6, 7, 8]
 
 *Time complexity: O(1) for a single value. O(n) for a set (array) where n = number of elements in the set (array)*
 
-### `.remove(Value or Array or Set)` -> `Set` remove elements from the set
+#### `.delete(Value or Array or Set)` -> `Set` delete elements from the set
 
 ```javascript
 var set = new Set([1, 2, 3, 4, 5, 6, 7, 8]);
 
-set.remove(1);
-// remove side effects original set!
+set.delete(1);
+// delete side effects original set!
 set.elements();   // -> [2, 3, 4, 5, 6, 7, 8]
 
-set.remove([2, 3]);
+set.delete([2, 3]);
 set.elements();   // -> [4, 5, 6, 7, 8]
 
-set.remove(new Set([4, 5]));
+set.delete(new Set([4, 5]));
 set.elements();   // -> [6, 7, 8]
 
-// remove can be chained
+// delete can be chained
 set
-  .remove(6)
-  .remove(7)
-  .remove(8);
+  .delete(6)
+  .delete(7)
+  .delete(8);
 set.elements();   // -> []
 ```
 
 *Time complexity: O(1) for a single value. O(n) for a set (array) where n = number of elements in the set (array)*
 
-### `.clone()` -> `Set` returns a new set that has the same elements as the original set
+#### `.clone()` -> `Set` returns a new set that has the same elements as the original set
 
 ```javascript
 var set = new Set([1, 2, 3]);
