@@ -161,15 +161,78 @@ i appreciate it if you open an issue first before
 
 #### set
 
-##### create a set: `new Set`
+##### `new Set(Nothing or Array or Set)` -> `Set` (create a set)
 
 ```javascript
-var emptySet = new Set;
+var emptySet = new Set();
 // or
 var setFromArray = new Set([1, 2, 3]);
 // or
 var clonedSet = new Set(setFromArray);
 ```
+*Time complexity: O(n) where n = number of elements in argument array or set*
+
+##### `.toString()` -> `String` (returns a string representation of the set)
+
+```javascript
+new Set().toString();            // -> '#{}'
+new Set([1, 2, 3]).toString();   // -> '#{1 2 3}'
+```
+
+*Time complexity: O(n) where n = number of elements in the set*
+
+##### `.isEmpty()` -> `Boolean` (returns whether set is empty)
+
+```javascript
+new Set().isEmpty();            // -> true
+new Set([1, 2, 3]).isEmpty();   // -> false
+```
+
+*Time complexity: O(1)*
+
+##### `.isEqual(Set)` -> `Boolean` (returns whether two sets contain the same elements)
+
+```javascript
+new Set().isEqual(new Set());             // -> true
+new Set().isEqual(new Set([1, 2, 3]));    // -> false
+
+var set = new Set([1, 2, 3]);
+set.isEqual(new Set([1, 2]));             // -> false
+set.isEqual(new Set([1, 2, 3]));          // -> true
+
+set.isEqual(set);                         // -> true
+```
+
+*Time complexity: O(n) where n = number of elements in the set*
+
+##### `.clone()` -> `Set` (returns a new set that has the same elements as the original set)
+
+```javascript
+new Set().isEmpty();            // -> true
+new Set([1, 2, 3]).isEmpty();   // -> false
+```
+
+*Time complexity: O(n) where n = number of elements in the set*
+
+##### `.isIn(Value)` -> `Boolean` (check if element is in set)
+
+```javascript
+var set = new Set([1, 2, 3]);
+set.isIn(1) // -> true
+set.isIn(4) // -> false
+```
+
+##### `.add(Value or Array or Set)` -> `Set` (add to a set)
+
+```javascript
+var set = new Set();
+set.add(1);
+set.is
+// side effects original set!
+// can be chained
+
+```
+
 
 #### dag
 

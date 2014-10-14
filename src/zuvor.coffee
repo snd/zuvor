@@ -29,6 +29,8 @@ do ->
       this.length is 0
     # O(1) best case. O(n) worst case.
     isEqual: (other) ->
+      unless other instanceof Set
+        throw new TypeError 'argument must be a set'
       that = this
       that.length is other.length and other.elements().every (x) ->
         that.isIn x
