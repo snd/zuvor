@@ -1,6 +1,6 @@
 {
   "name": "zuvor",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "simple and reasonably fast implementation of directed acyclic graphs and sets with focus on finding the fastest execution order of interdependent tasks",
   "keywords": [
     "dag",
@@ -13,7 +13,12 @@
     "set",
     "strict",
     "partial",
-    "order"
+    "order",
+    "task",
+    "dependency",
+    "execution",
+    "optimal",
+    "taxonomy"
   ],
   "homepage": "http://github.com/snd/zuvor",
   "author": {
