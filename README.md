@@ -182,7 +182,7 @@ new Set(1, 2, 3).size;    // -> 3
 
 ```javascript
 new Set().values();           // -> []
-new Set(1, 2, 3).values();  // -> [1, 2, 3]
+new Set(1, 2, 3).values();    // -> [1, 2, 3]
 ```
 
 *O(n) where n = number of elements in the set*
@@ -190,8 +190,8 @@ new Set(1, 2, 3).values();  // -> [1, 2, 3]
 ##### `.toString()` -> `String` returns a string representation of the set
 
 ```javascript
-new Set().toString();            // -> '#{}'
-new Set(1, 2, 3).toString();   // -> '#{1 2 3}'
+new Set().toString();         // -> '#{}'
+new Set(1, 2, 3).toString();  // -> '#{1 2 3}'
 ```
 
 *O(n) where n = number of elements in the set*
@@ -199,17 +199,17 @@ new Set(1, 2, 3).toString();   // -> '#{1 2 3}'
 ##### `.equals(Set)` -> `Boolean` returns whether two sets contain the same elements
 
 ```javascript
-new Set().equals(new Set());             // -> true
-new Set().equals(new Set(1, 2, 3));    // -> false
+new Set().equals(new Set());          // -> true
+new Set().equals(new Set(1, 2, 3));   // -> false
 
 var set = new Set(1, 2, 3);
-set.equals(new Set(1, 2));             // -> false
-set.equals(new Set(1, 2, 3));          // -> true
+set.equals(new Set(1, 2));            // -> false
+set.equals(new Set(1, 2, 3));         // -> true
 
-set.equals(set);                         // -> true
+set.equals(set);                      // -> true
 ```
 
-*best case: O(1). worst case: O(n) where n = number of elements in the set*
+*best case if size differs is O(1). worst case is O(n) where n = number of elements in the set*
 
 ##### `.has(Value)` -> `Boolean` returns whether a value is in the set
 
@@ -228,23 +228,23 @@ var set = new Set();
 
 set.add(1);
 // add side effects original set!
-set.elements();   // -> [1]
+set.values();     // -> [1]
 
 set.add(2, 3);
-set.elements();   // -> [1, 2, 3]
+set.values();     // -> [1, 2, 3]
 
 set.add([4, 5]);
-set.elements();   // -> [1, 2, 3, 4, 5]
+set.values();     // -> [1, 2, 3, 4, 5]
 
 set.add(new Set([6, 7]));
-set.elements();   // -> [1, 2, 3, 4, 5, 6, 7]
+set.values();     // -> [1, 2, 3, 4, 5, 6, 7]
 
 // add can be chained
 set
   .add(8)
   .add(9)
   .add(10);
-set.elements();   // -> [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+set.values();     // -> [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 ```
 
 *O(1) for a single value. O(n) for a set (array) where n = number of elements in the set (array)*
@@ -256,23 +256,23 @@ var set = new Set(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
 
 set.delete(1);
 // delete side effects original set!
-set.elements();   // -> [2, 3, 4, 5, 6, 7, 8, 9, 10]
+set.values();     // -> [2, 3, 4, 5, 6, 7, 8, 9, 10]
 
 set.delete(2, 3);
-set.elements();   // -> [4, 5, 6, 7, 8, 9, 10]
+set.values();     // -> [4, 5, 6, 7, 8, 9, 10]
 
 set.delete([4, 5]);
-set.elements();   // -> [6, 7, 8, 9, 10]
+set.values();     // -> [6, 7, 8, 9, 10]
 
 set.delete(new Set([6, 7]));
-set.elements();   // -> [8, 9, 10]
+set.values();     // -> [8, 9, 10]
 
 // delete can be chained
 set
   .delete(8)
   .delete(9)
   .delete(10);
-set.elements();   // -> []
+set.values();     // -> []
 ```
 
 *O(1) for a single value. O(n) for a set (array) where n = number of elements in the set (array)*
@@ -282,7 +282,7 @@ set.elements();   // -> []
 ```javascript
 var set = new Set(1, 2, 3);
 var clone = set.clone();
-set.isEqual(clone);     // -> true
+set.equals(clone);     // -> true
 ```
 
 *O(n) where n = number of elements in the set*
