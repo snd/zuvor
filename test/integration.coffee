@@ -8,6 +8,7 @@ Promise = require 'bluebird'
 module.exports =
 
   'systems are started and stopped in the most efficient order': (test) ->
+    test.expect 28
 
     ###################################################################################
     # services
@@ -15,10 +16,10 @@ module.exports =
     services =
       redisOne:
         start: ->
-          test.ok starting.isEqual(
-            new Set(['redisOne', 'redisTwo', 'postgres', 'elasticSearch', 'mailAPI'])
+          test.ok starting.equals(
+            new Set('redisOne', 'redisTwo', 'postgres', 'elasticSearch', 'mailAPI')
           )
-          test.ok running.isEqual(
+          test.ok running.equals(
             new Set
           )
           Promise.delay(10)
@@ -26,10 +27,10 @@ module.exports =
           Promise.delay(100)
       redisTwo:
         start: ->
-          test.ok starting.isEqual(
-            new Set(['redisOne', 'redisTwo', 'postgres', 'elasticSearch', 'mailAPI'])
+          test.ok starting.equals(
+            new Set('redisOne', 'redisTwo', 'postgres', 'elasticSearch', 'mailAPI')
           )
-          test.ok running.isEqual(
+          test.ok running.equals(
             new Set
           )
           Promise.delay(20)
@@ -37,76 +38,123 @@ module.exports =
           Promise.delay(100)
       serverOne:
         start: ->
-          Promise.delay(100)
+          test.ok starting.equals(
+            new Set('mailAPI', 'serverOne', 'serverTwo', 'serverThree')
+          )
+          test.ok running.equals(
+            new Set('redisOne', 'redisTwo', 'postgres', 'elasticSearch', 'cache')
+          )
+          Promise.delay(5)
         stop: ->
           Promise.delay(100)
       serverTwo:
         start: ->
-          Promise.delay(100)
+          test.ok starting.equals(
+            new Set(['mailAPI', 'serverOne', 'serverTwo', 'serverThree'])
+          )
+          test.ok running.equals(
+            new Set(['redisOne', 'redisTwo', 'postgres', 'elasticSearch', 'cache'])
+          )
+          Promise.delay(30)
         stop: ->
           Promise.delay(100)
       serverThree:
         start: ->
-          Promise.delay(100)
+          test.ok starting.equals(
+            new Set(['mailAPI', 'serverOne', 'serverTwo', 'serverThree'])
+          )
+          test.ok running.equals(
+            new Set(['redisOne', 'redisTwo', 'postgres', 'elasticSearch', 'cache'])
+          )
+          Promise.delay(60)
         stop: ->
           Promise.delay(100)
       elasticSearch:
         start: ->
-          test.ok starting.isEqual(
-            new Set(['redisOne', 'redisTwo', 'postgres', 'elasticSearch', 'mailAPI'])
+          test.ok starting.equals(
+            new Set('redisOne', 'redisTwo', 'postgres', 'elasticSearch', 'mailAPI')
           )
-          test.ok running.isEqual(
+          test.ok running.equals(
             new Set
           )
-          Promise.delay(100)
+          Promise.delay(25)
         stop: ->
           Promise.delay(100)
       mailAPI:
         start: ->
-          test.ok starting.isEqual(
-            new Set(['redisOne', 'redisTwo', 'postgres', 'elasticSearch', 'mailAPI'])
+          test.ok starting.equals(
+            new Set('redisOne', 'redisTwo', 'postgres', 'elasticSearch', 'mailAPI')
           )
-          test.ok running.isEqual(
+          test.ok running.equals(
             new Set
           )
-          Promise.delay(100)
+          Promise.delay(60)
         stop: ->
           Promise.delay(100)
       cache:
         start: ->
-          test.ok starting.isEqual(
-            new Set(['postgres', 'elasticSearch', 'mailAPI', 'cache'])
+          test.ok starting.equals(
+            new Set('elasticSearch', 'mailAPI', 'cache')
           )
-          test.ok running.isEqual(
-            new Set(['redisOne', 'redisTwo'])
+          test.ok running.equals(
+            new Set('redisOne', 'redisTwo', 'postgres')
           )
-          Promise.delay(100)
+          Promise.delay(30)
         stop: ->
           Promise.delay(100)
       postgres:
         start: ->
-          test.ok starting.isEqual(
-            new Set(['redisOne', 'redisTwo', 'postgres', 'elasticSearch', 'mailAPI'])
+          test.ok starting.equals(
+            new Set('redisOne', 'redisTwo', 'postgres', 'elasticSearch', 'mailAPI')
           )
-          test.ok running.isEqual(
+          test.ok running.equals(
             new Set
           )
-          Promise.delay(100)
+          Promise.delay(15)
         stop: ->
           Promise.delay(100)
       loadBalancer:
         start: ->
-          Promise.delay(100)
+          test.ok starting.equals(
+            new Set('workerTwo', 'loadBalancer')
+          )
+          test.ok running.equals(
+            new Set(
+              'redisOne',
+              'redisTwo',
+              'postgres',
+              'elasticSearch',
+              'cache',
+              'serverOne',
+              'serverTwo',
+              'serverThree',
+              'mailAPI',
+              'workerOne'
+            )
+          )
+          Promise.delay(20)
         stop: ->
           Promise.delay(100)
       workerOne:
         start: ->
-          Promise.delay(100)
+          test.ok starting.equals(
+            new Set('serverTwo', 'serverThree', 'workerOne', 'workerTwo')
+          )
+          test.ok running.equals(
+            new Set('redisOne', 'redisTwo', 'postgres', 'elasticSearch', 'cache', 'serverOne', 'mailAPI')
+          )
+          Promise.delay(10)
         stop: ->
           Promise.delay(100)
       workerTwo:
         start: ->
-          Promise.delay(100)
+          test.ok starting.equals(
+            new Set('serverTwo', 'serverThree', 'workerOne', 'workerTwo')
+          )
+          test.ok running.equals(
+            new Set('redisOne', 'redisTwo', 'postgres', 'elasticSearch', 'cache', 'serverOne', 'mailAPI')
+          )
+          Promise.delay(60)
         stop: ->
           Promise.delay(100)
 
@@ -151,45 +199,41 @@ module.exports =
     stopped = new Set
 
     start = (names) ->
-      console.log('starting:', names)
       starting.add names
       Promise.all names.map (name) ->
         callback = services[name].start
         promise = Promise.resolve(callback())
         promise.then ->
-          console.log('running:  ' + name)
-          starting.remove name
+          starting.delete name
           running.add name
           # start all we can start now that have not been started
-          toStart = new Set(dag.whereAllParentsIn(running.elements()))
-            .remove(starting)
-            .remove(running)
-            .elements()
+          toStart = new Set(dag.whereAllParentsIn(running.keys()))
+            .delete(starting)
+            .delete(running)
+            .keys()
           start toStart
 
     stop = (names) ->
-      console.log('stopping: ', names)
       stopping.add names
       return Promise.all names.map (name) ->
         callback = services[name].stop
         promise = Promise.resolve callback()
         promise.then ->
-          console.log('stopped:  ' + name)
-          stopping.remove name
+          stopping.delete name
           stopped.add name
           # stop all we can stop now that have not been stopped
-          toStop = new Set(dag.whereAllChildrenIn(stopped.elements()))
-            .remove(stopping)
-            .remove(stopped)
-            .elements()
+          toStop = new Set(dag.whereAllChildrenIn(stopped.keys()))
+            .delete(stopping)
+            .delete(stopped)
+            .keys()
           stop toStop
 
     start(dag.parentless())
       .then ->
-        test.ok running.isEqual new Set Object.keys(services)
-        test.ok starting.isEqual new Set
+        test.ok running.equals new Set Object.keys(services)
+        test.ok starting.equals new Set
         stop dag.childless()
       .then ->
-        test.ok stopped.isEqual new Set Object.keys(services)
-        test.ok stopping.isEqual new Set
+        test.ok stopped.equals new Set Object.keys(services)
+        test.ok stopping.equals new Set
         test.done()
