@@ -2,12 +2,6 @@
 
 ## TODO
 
-- integration test: tasks are executed in the right order
-  - draw the graph
-  - devise an interesting timing
-  - add assertions for the correct run (in the callbacks)
-  - add test.expect
-
 - clean up naming/terminology
 
 - finish readme
@@ -160,12 +154,14 @@ i appreciate it if you open an issue first before
 
 ## Set API
 
-tries to follow the ECMA6 set api as closely as possible
+tries to follow the ECMA6 set api.
 
 #### `new Set(Nothing or Array or Set)` -> `Set` create a set
 
 ```javascript
 var emptySet = new Set();
+// or
+var setFromArgs = new Set(1, 2, 3);
 // or
 var setFromArray = new Set([1, 2, 3]);
 // or
@@ -182,11 +178,11 @@ new Set(1, 2, 3).size;    // -> 3
 
 *Time complexity: O(1)*
 
-#### `.elements()` -> `Array` returns an array of all the elements in the set
+#### `.values()` -> `Array` returns an array of all the elements in the set
 
 ```javascript
-new Set().elements();           // -> []
-new Set([1, 2, 3]).elements();  // -> [1, 2, 3]
+new Set().values();           // -> []
+new Set(1, 2, 3).values();  // -> [1, 2, 3]
 ```
 
 *Time complexity: O(n) where n = number of elements in the set*
@@ -195,41 +191,32 @@ new Set([1, 2, 3]).elements();  // -> [1, 2, 3]
 
 ```javascript
 new Set().toString();            // -> '#{}'
-new Set([1, 2, 3]).toString();   // -> '#{1 2 3}'
+new Set(1, 2, 3).toString();   // -> '#{1 2 3}'
 ```
 
 *Time complexity: O(n) where n = number of elements in the set*
 
-#### `.isEmpty()` -> `Boolean` returns whether the set is empty
+#### `.equals(Set)` -> `Boolean` returns whether two sets contain the same elements
 
 ```javascript
-new Set().isEmpty();            // -> true
-new Set([1, 2, 3]).isEmpty();   // -> false
-```
+new Set().equals(new Set());             // -> true
+new Set().equals(new Set(1, 2, 3));    // -> false
 
-*Time complexity: O(1)*
+var set = new Set(1, 2, 3);
+set.equals(new Set(1, 2));             // -> false
+set.equals(new Set(1, 2, 3));          // -> true
 
-#### `.isEqual(Set)` -> `Boolean` returns whether two sets contain the same elements
-
-```javascript
-new Set().isEqual(new Set());             // -> true
-new Set().isEqual(new Set([1, 2, 3]));    // -> false
-
-var set = new Set([1, 2, 3]);
-set.isEqual(new Set([1, 2]));             // -> false
-set.isEqual(new Set([1, 2, 3]));          // -> true
-
-set.isEqual(set);                         // -> true
+set.equals(set);                         // -> true
 ```
 
 *Time complexity: best case: O(1). worst case: O(n) where n = number of elements in the set*
 
-#### `.isIn(Value)` -> `Boolean` returns whether a value is in the set
+#### `.has(Value)` -> `Boolean` returns whether a value is in the set
 
 ```javascript
-var set = new Set([1, 2, 3]);
-set.isIn(1);  // -> true
-set.isIn(4);  // -> false
+var set = new Set(1, 2, 3);
+set.has(1);  // -> true
+set.has(4);  // -> false
 ```
 
 *Time complexity: O(1)*
@@ -243,18 +230,21 @@ set.add(1);
 // add side effects original set!
 set.elements();   // -> [1]
 
-set.add([2, 3]);
+set.add(2, 3);
 set.elements();   // -> [1, 2, 3]
 
-set.add(new Set([4, 5]));
+set.add([4, 5]);
 set.elements();   // -> [1, 2, 3, 4, 5]
 
-// remove can be chained
+set.add(new Set([6, 7]));
+set.elements();   // -> [1, 2, 3, 4, 5, 6, 7]
+
+// add can be chained
 set
-  .add(6)
-  .add(7)
-  .add(8);
-set.elements();   // -> [1, 2, 3, 4, 5, 6, 7, 8]
+  .add(8)
+  .add(9)
+  .add(10);
+set.elements();   // -> [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 ```
 
 *Time complexity: O(1) for a single value. O(n) for a set (array) where n = number of elements in the set (array)*
@@ -262,23 +252,26 @@ set.elements();   // -> [1, 2, 3, 4, 5, 6, 7, 8]
 #### `.delete(Value or Array or Set)` -> `Set` delete elements from the set
 
 ```javascript
-var set = new Set([1, 2, 3, 4, 5, 6, 7, 8]);
+var set = new Set(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
 
 set.delete(1);
 // delete side effects original set!
-set.elements();   // -> [2, 3, 4, 5, 6, 7, 8]
+set.elements();   // -> [2, 3, 4, 5, 6, 7, 8, 9, 10]
 
-set.delete([2, 3]);
-set.elements();   // -> [4, 5, 6, 7, 8]
+set.delete(2, 3);
+set.elements();   // -> [4, 5, 6, 7, 8, 9, 10]
 
-set.delete(new Set([4, 5]));
-set.elements();   // -> [6, 7, 8]
+set.delete([4, 5]);
+set.elements();   // -> [6, 7, 8, 9, 10]
+
+set.delete(new Set([6, 7]));
+set.elements();   // -> [8, 9, 10]
 
 // delete can be chained
 set
-  .delete(6)
-  .delete(7)
-  .delete(8);
+  .delete(8)
+  .delete(9)
+  .delete(10);
 set.elements();   // -> []
 ```
 
@@ -287,12 +280,23 @@ set.elements();   // -> []
 #### `.clone()` -> `Set` returns a new set that has the same elements as the original set
 
 ```javascript
-var set = new Set([1, 2, 3]);
+var set = new Set(1, 2, 3);
 var clone = set.clone();
 set.isEqual(clone);     // -> true
 ```
 
 *Time complexity: O(n) where n = number of elements in the set*
+
+#### `.clear()` -> `Set` clears the set and returns it
+
+```javascript
+var set = new Set(1, 2, 3);
+set.size;     // -> 3
+set.clear();
+set.size;     // -> 0
+```
+
+*Time complexity: O(1)*
 
 ## Dag API
 
