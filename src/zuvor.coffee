@@ -12,86 +12,92 @@ do ->
   ###################################################################################
   # set
 
-  Set = (other) ->
+  Set = (args...) ->
     # create a new object that doesn't inherit any properties from Object
     this._map = Object.create(null)
-    this.length = 0
-    if other?
-      this.add other
+    this.size = 0
+    if args.length isnt 0
+      this.add args...
     return this
 
   Set.prototype =
     # O(1)
-    isIn: (x) ->
+    has: (x) ->
       this._map[x]?
-    # O(1)
-    isEmpty: ->
-      this.length is 0
     # O(1) best case. O(n) worst case.
-    isEqual: (other) ->
+    equals: (other) ->
       unless other instanceof Set
         throw new TypeError 'argument must be a set'
       that = this
-      that.length is other.length and other.elements().every (x) ->
-        that.isIn x
+      that.size is other.size and other.keys().every (x) ->
+        that.has x
     # O(n)
     toString: ->
-      '#{' + Object.keys(this._map).join(' ') + '}'
+      '#{' + this.keys().join(' ') + '}'
     # O(n)
-    elements: ->
+    keys: ->
       elements = []
       for k, v of this._map
         if v
           elements.push k
       return elements
     # O(n) where n is the amount of elements in other
-    add: (other) ->
+    add: (args...) ->
+      for arg in args
+        type = typeof arg
+        if type is 'string' or type is 'number'
+          unless this.has arg
+            this._map[arg] = true
+            this.size++
+        else if arg instanceof Set
+          for key of arg._map
+            unless this.has key
+              this._map[key] = true
+              this.size++
+        else if Array.isArray arg
+          for v in arg
+            unless this.has v
+              this._map[v] = true
+              this.size++
+        else
+          throw new TypeError 'unsupported argument type'
+      # for chaining
+      return this
+    # O(n) where n is the amount of elements in other
+    delete: (other) ->
       type = typeof other
       if type is 'string' or type is 'number'
-        unless this.isIn other
-          this._map[other] = true
-          this.length++
+        if this.has other
+          # delete is dog slow
+          this._map[other] = undefined
+          this.size--
       else if other instanceof Set
         for key of other._map
-          unless this.isIn key
-            this._map[key] = true
-            this.length++
+          if this.has key
+            # delete is dog slow
+            this._map[key] = undefined
+            this.size--
       else if Array.isArray other
         for v in other
-          unless this.isIn v
-            this._map[v] = true
-            this.length++
+          if this.has v
+            # delete is dog slow
+            this._map[v] = undefined
+            this.size--
       else
         throw new TypeError 'unsupported argument type'
       # for chaining
       return this
-    # O(n) where n is the amount of elements in other
-    remove: (other) ->
-      type = typeof other
-      if type is 'string' or type is 'number'
-        if this.isIn other
-          # delete is dog slow
-          this._map[other] = undefined
-          this.length--
-      else if other instanceof Set
-        for key of other._map
-          if this.isIn key
-            # delete is dog slow
-            this._map[key] = undefined
-            this.length--
-      else if Array.isArray other
-        for v in other
-          if this.isIn v
-            # delete is dog slow
-            this._map[v] = undefined
-            this.length--
-      else
-        throw new TypeError 'unsupported argument type'
+    clear: ->
+      # create a new object that doesn't inherit any properties from Object
+      this._map = Object.create(null)
+      this.size = 0
       # for chaining
       return this
     # O(n)
     clone: ->
       new Set this
+
+  Set.prototype.values = Set.prototype.keys
 
   ###################################################################################
   # directed acyclic graph

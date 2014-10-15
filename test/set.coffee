@@ -5,10 +5,8 @@ module.exports =
   'zero elements': (test) ->
     set = new Set
 
-    test.ok not set.isIn 'A'
+    test.ok not set.has 'A'
     test.equal set.toString(), '#{}'
-
-    test.ok set.remove set
 
     test.done()
 
@@ -19,8 +17,8 @@ module.exports =
       .add 'A'
       .add 'A'
 
-    test.ok set.isIn 'A'
-    test.ok not set.isIn 'B'
+    test.ok set.has 'A'
+    test.ok not set.has 'B'
     test.equal set.toString(), '#{A}'
 
     test.done()
@@ -36,22 +34,14 @@ module.exports =
       .add 'A'
       .add 'A'
 
-    test.ok set.isIn 1
-    test.ok set.isIn 2.2
-    test.ok set.isIn 'A'
-    test.ok not set.isIn 2
-    test.ok not set.isIn 3.3
-    test.ok not set.isIn 'B'
+    test.ok set.has 1
+    test.ok set.has 2.2
+    test.ok set.has 'A'
+    test.ok not set.has 2
+    test.ok not set.has 3.3
+    test.ok not set.has 'B'
     test.equal set.toString(), '#{1 2.2 A}'
 
-    test.done()
-
-  'can not add objects': (test) ->
-    set = new Set
-    test.throws ->
-      set.add {}
-    test.throws ->
-      set.add null
     test.done()
 
   'add': (test) ->
@@ -59,58 +49,68 @@ module.exports =
 
     set.add 1
 
-    test.ok set.isIn 1
-    test.ok not set.isIn 2
-    test.ok not set.isIn 3
-    test.ok not set.isIn 4
-    test.ok not set.isIn 5
+    test.ok set.has 1
+    test.ok not set.has 2
+    test.ok not set.has 3
+    test.ok not set.has 4
+    test.ok not set.has 5
 
     set.add [2, 3]
 
-    test.ok set.isIn 1
-    test.ok set.isIn 2
-    test.ok set.isIn 3
-    test.ok not set.isIn 4
-    test.ok not set.isIn 5
+    test.ok set.has 1
+    test.ok set.has 2
+    test.ok set.has 3
+    test.ok not set.has 4
+    test.ok not set.has 5
 
     set.add new Set [4, 5]
 
-    test.ok set.isIn 1
-    test.ok set.isIn 2
-    test.ok set.isIn 3
-    test.ok set.isIn 4
-    test.ok set.isIn 5
+    test.ok set.has 1
+    test.ok set.has 2
+    test.ok set.has 3
+    test.ok set.has 4
+    test.ok set.has 5
 
     test.done()
 
-  'remove': (test) ->
+  'delete': (test) ->
     set = new Set [1, 2, 3, 4, 5]
 
-    set.remove 1
+    set.delete 1
 
-    test.ok not set.isIn 1
-    test.ok set.isIn 2
-    test.ok set.isIn 3
-    test.ok set.isIn 4
-    test.ok set.isIn 5
+    test.ok not set.has 1
+    test.ok set.has 2
+    test.ok set.has 3
+    test.ok set.has 4
+    test.ok set.has 5
 
-    set.remove [2, 3]
+    set.delete [2, 3]
 
-    test.ok not set.isIn 1
-    test.ok not set.isIn 2
-    test.ok not set.isIn 3
-    test.ok set.isIn 4
-    test.ok set.isIn 5
+    test.ok not set.has 1
+    test.ok not set.has 2
+    test.ok not set.has 3
+    test.ok set.has 4
+    test.ok set.has 5
 
-    set.remove new Set [4, 5]
+    set.delete new Set [4, 5]
 
-    test.ok not set.isIn 1
-    test.ok not set.isIn 2
-    test.ok not set.isIn 3
-    test.ok not set.isIn 4
-    test.ok not set.isIn 5
+    test.ok not set.has 1
+    test.ok not set.has 2
+    test.ok not set.has 3
+    test.ok not set.has 4
+    test.ok not set.has 5
 
     test.done()
+
+  'failures':
+
+    'can not add objects': (test) ->
+      set = new Set
+      test.throws ->
+        set.add {}
+      test.throws ->
+        set.add null
+      test.done()
 
   'properties that hold for any set': (test) ->
     xss = [
@@ -131,47 +131,69 @@ module.exports =
       set2 = new Set
       set2.add xs
 
-      set3 = new Set
+      # construction method 3
+      set2 = new Set
+      set2.add xs
 
       # construction method 3
+      set3 = new Set
       xs.forEach (x) ->
         set3.add x
 
+      # construction method 4
+      set4 = new Set
+      set4.add xs...
+
+      # construction method 5
+      set5 = new Set xs...
+
       # construction methods are equivalent
-      test.ok set.isEqual set2
-      test.ok set2.isEqual set3
+      test.ok set.equals set2
+      test.ok set2.equals set3
+      test.ok set3.equals set4
+      test.ok set4.equals set5
 
-      test.equal xs.length, set.length
-      test.deepEqual xs, set.elements()
-
-      # the empty set is empty
-      test.equal set.isEmpty(), xs.length is 0
-
-      # any set is equal to itself
-      test.ok set.isEqual set
-
-      clone = set.clone()
-      # any set is equal to its clone
-      test.ok set.isEqual clone
-      # any set is equal to a new set initialized with it
-      test.ok set.isEqual new Set set
-      # adding the set again doesn't change it
-      set.add set
-      test.ok set.isEqual clone
-      # adding the array again doesn't change it
-      set.add xs
-      test.ok set.isEqual clone
+      test.equal xs.length, set.size
+      test.deepEqual xs, set.keys()
+      test.deepEqual xs, set.values()
 
       # every element is in the set
       xs.forEach (x) ->
-        test.ok set.isIn x
+        test.ok set.has x
 
-      test.ok not set.isIn 'F'
+      # an element is not in the set
+      test.ok not set.has 'F'
+
+      # size matches
+      test.equal set.size, xs.length
+
+      # any set is equal to itself
+      test.ok set.equals set
+
+      # any set is equal to its clone
+      test.ok set.equals set.clone()
+
+      # any set is equal to a new set initialized with it
+      test.ok set.equals new Set set
+
+      # adding the set again doesn't change it
+      clone = set.clone()
+      clone.add set
+      test.ok set.equals clone
+
+      # adding the array again doesn't change it
+      clone = set.clone()
+      clone.add xs
+      test.ok set.equals clone
 
       # removing a set from itself results in the empty set
-      clone2 = set.clone()
-      clone2.remove clone2
-      test.ok clone2.isEmpty()
-      test.equal clone2.length, 0
+      clone = set.clone()
+      clone.delete set
+      test.equals 0, clone.size
+
+      # clearing a set results in the empty set
+      clone = set.clone()
+      clone.clear()
+      test.equals 0, clone.size
 
     test.done()
