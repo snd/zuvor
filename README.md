@@ -156,7 +156,7 @@ i appreciate it if you open an issue first before
 
 tries to follow the ECMA6 set api.
 
-#### `new Set(Nothing or Array or Set)` -> `Set` create a set
+##### `new Set(Nothing or Array or Set)` -> `Set` create a set
 
 ```javascript
 var emptySet = new Set();
@@ -167,36 +167,36 @@ var setFromArray = new Set([1, 2, 3]);
 // or
 var clonedSet = new Set(setFromArray);
 ```
-*Time complexity: O(n) where n = number of elements in argument array or set*
+*O(n) where n = number of elements in argument array or set*
 
-#### `.size` -> `Integer` number of elements in the set
+##### `.size` -> `Integer` number of elements in the set
 
 ```javascript
 new Set().size;           // -> 0
 new Set(1, 2, 3).size;    // -> 3
 ```
 
-*Time complexity: O(1)*
+*O(1)*
 
-#### `.values()` -> `Array` returns an array of all the elements in the set
+##### `.values()` -> `Array` returns an array of all the elements in the set
 
 ```javascript
 new Set().values();           // -> []
 new Set(1, 2, 3).values();  // -> [1, 2, 3]
 ```
 
-*Time complexity: O(n) where n = number of elements in the set*
+*O(n) where n = number of elements in the set*
 
-#### `.toString()` -> `String` returns a string representation of the set
+##### `.toString()` -> `String` returns a string representation of the set
 
 ```javascript
 new Set().toString();            // -> '#{}'
 new Set(1, 2, 3).toString();   // -> '#{1 2 3}'
 ```
 
-*Time complexity: O(n) where n = number of elements in the set*
+*O(n) where n = number of elements in the set*
 
-#### `.equals(Set)` -> `Boolean` returns whether two sets contain the same elements
+##### `.equals(Set)` -> `Boolean` returns whether two sets contain the same elements
 
 ```javascript
 new Set().equals(new Set());             // -> true
@@ -209,9 +209,9 @@ set.equals(new Set(1, 2, 3));          // -> true
 set.equals(set);                         // -> true
 ```
 
-*Time complexity: best case: O(1). worst case: O(n) where n = number of elements in the set*
+*best case: O(1). worst case: O(n) where n = number of elements in the set*
 
-#### `.has(Value)` -> `Boolean` returns whether a value is in the set
+##### `.has(Value)` -> `Boolean` returns whether a value is in the set
 
 ```javascript
 var set = new Set(1, 2, 3);
@@ -219,9 +219,9 @@ set.has(1);  // -> true
 set.has(4);  // -> false
 ```
 
-*Time complexity: O(1)*
+*O(1)*
 
-#### `.add(Value or Array or Set)` -> `Set` add elements to the set
+##### `.add(Value or Array or Set)` -> `Set` add elements to the set
 
 ```javascript
 var set = new Set();
@@ -247,9 +247,9 @@ set
 set.elements();   // -> [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 ```
 
-*Time complexity: O(1) for a single value. O(n) for a set (array) where n = number of elements in the set (array)*
+*O(1) for a single value. O(n) for a set (array) where n = number of elements in the set (array)*
 
-#### `.delete(Value or Array or Set)` -> `Set` delete elements from the set
+##### `.delete(Value or Array or Set)` -> `Set` delete elements from the set
 
 ```javascript
 var set = new Set(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
@@ -275,9 +275,9 @@ set
 set.elements();   // -> []
 ```
 
-*Time complexity: O(1) for a single value. O(n) for a set (array) where n = number of elements in the set (array)*
+*O(1) for a single value. O(n) for a set (array) where n = number of elements in the set (array)*
 
-#### `.clone()` -> `Set` returns a new set that has the same elements as the original set
+##### `.clone()` -> `Set` returns a new set that has the same elements as the original set
 
 ```javascript
 var set = new Set(1, 2, 3);
@@ -285,9 +285,9 @@ var clone = set.clone();
 set.isEqual(clone);     // -> true
 ```
 
-*Time complexity: O(n) where n = number of elements in the set*
+*O(n) where n = number of elements in the set*
 
-#### `.clear()` -> `Set` clears the set and returns it
+##### `.clear()` -> `Set` clears the set and returns it
 
 ```javascript
 var set = new Set(1, 2, 3);
@@ -296,7 +296,7 @@ set.clear();
 set.size;     // -> 0
 ```
 
-*Time complexity: O(1)*
+*O(1)*
 
 ## Dag API
 
