@@ -8,7 +8,7 @@ Promise = require 'bluebird'
 module.exports =
 
   'systems are started and stopped in the most efficient order': (test) ->
-    # test.expect 28
+    test.expect (12 * 4) + 3 + 3
 
     starting = new Set
     running = new Set
