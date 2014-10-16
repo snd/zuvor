@@ -41,6 +41,11 @@ do ->
         if v
           elements.push k
       return elements
+    # O(n)
+    forEach: (f) ->
+      for k, v of this._map
+        if v
+          f k
     # O(n) where n is the amount of elements in other
     add: (args...) ->
       for arg in args
@@ -50,10 +55,11 @@ do ->
             this._map[arg] = true
             this.size++
         else if arg instanceof Set
-          for key of arg._map
-            unless this.has key
-              this._map[key] = true
-              this.size++
+          that = this
+          arg.forEach (x) ->
+            unless that.has x
+              that._map[x] = true
+              that.size++
         else if Array.isArray arg
           for v in arg
             unless this.has v
@@ -64,29 +70,44 @@ do ->
       # for chaining
       return this
     # O(n) where n is the amount of elements in other
-    delete: (other) ->
-      type = typeof other
-      if type is 'string' or type is 'number'
-        if this.has other
-          # delete is dog slow
-          this._map[other] = undefined
-          this.size--
-      else if other instanceof Set
-        for key of other._map
-          if this.has key
+    delete: (args...) ->
+      for arg in args
+        type = typeof arg
+        if type is 'string' or type is 'number'
+          if this.has arg
             # delete is dog slow
-            this._map[key] = undefined
+            this._map[arg] = undefined
             this.size--
-      else if Array.isArray other
-        for v in other
-          if this.has v
-            # delete is dog slow
-            this._map[v] = undefined
-            this.size--
-      else
-        throw new TypeError 'unsupported argument type'
-      # for chaining
+        else if arg instanceof Set
+          that = this
+          arg.forEach (x) ->
+            if that.has x
+              # delete is dog slow
+              that._map[x] = undefined
+              that.size--
+        else if Array.isArray arg
+          for v in arg
+            if this.has v
+              # delete is dog slow
+              this._map[v] = undefined
+              this.size--
+        else
+          throw new TypeError 'unsupported argument type'
+        # for chaining
       return this
+    # O(n) where n is the amount of elements in the smaller set
+    # intersection: (other) ->
+    #   result = new Set
+    #   if this.size > other.size
+    #     bigger = this
+    #     smaller = other
+    #   else
+    #     bigger = other
+    #     smaller = this
+    #   smaller.forEach (x) ->
+    #     if bigger.has x
+    #       result.add x
+    #   return result
     clear: ->
       # create a new object that doesn't inherit any properties from Object
       this._map = Object.create(null)
