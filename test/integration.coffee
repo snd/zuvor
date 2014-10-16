@@ -8,7 +8,16 @@ Promise = require 'bluebird'
 module.exports =
 
   'systems are started and stopped in the most efficient order': (test) ->
-    test.expect 28
+    # test.expect 28
+
+    starting = new Set
+    running = new Set
+    stopping = new Set
+
+    debug = ->
+      console.log 'starting', starting.toString()
+      console.log 'stopping', stopping.toString()
+      console.log 'running', running.toString()
 
     ###################################################################################
     # services
@@ -24,7 +33,7 @@ module.exports =
           )
           Promise.delay(10)
         stop: ->
-          Promise.delay(100)
+          Promise.delay(10)
       redisTwo:
         start: ->
           test.ok starting.equals(
@@ -35,7 +44,7 @@ module.exports =
           )
           Promise.delay(20)
         stop: ->
-          Promise.delay(100)
+          Promise.delay(20)
       serverOne:
         start: ->
           test.ok starting.equals(
@@ -46,7 +55,7 @@ module.exports =
           )
           Promise.delay(5)
         stop: ->
-          Promise.delay(100)
+          Promise.delay(5)
       serverTwo:
         start: ->
           test.ok starting.equals(
@@ -57,7 +66,7 @@ module.exports =
           )
           Promise.delay(30)
         stop: ->
-          Promise.delay(100)
+          Promise.delay(30)
       serverThree:
         start: ->
           test.ok starting.equals(
@@ -68,7 +77,7 @@ module.exports =
           )
           Promise.delay(60)
         stop: ->
-          Promise.delay(100)
+          Promise.delay(60)
       elasticSearch:
         start: ->
           test.ok starting.equals(
@@ -79,7 +88,7 @@ module.exports =
           )
           Promise.delay(25)
         stop: ->
-          Promise.delay(100)
+          Promise.delay(25)
       mailAPI:
         start: ->
           test.ok starting.equals(
@@ -90,7 +99,7 @@ module.exports =
           )
           Promise.delay(60)
         stop: ->
-          Promise.delay(100)
+          Promise.delay(60)
       cache:
         start: ->
           test.ok starting.equals(
@@ -101,7 +110,7 @@ module.exports =
           )
           Promise.delay(30)
         stop: ->
-          Promise.delay(100)
+          Promise.delay(30)
       postgres:
         start: ->
           test.ok starting.equals(
@@ -112,7 +121,7 @@ module.exports =
           )
           Promise.delay(15)
         stop: ->
-          Promise.delay(100)
+          Promise.delay(15)
       loadBalancer:
         start: ->
           test.ok starting.equals(
@@ -134,7 +143,27 @@ module.exports =
           )
           Promise.delay(20)
         stop: ->
-          Promise.delay(100)
+          test.ok stopping.equals(
+            new Set(
+              'loadBalancer',
+              'workerOne',
+              'workerTwo',
+            )
+          )
+          test.ok running.equals(
+            new Set(
+              'redisOne',
+              'redisTwo',
+              'postgres',
+              'elasticSearch',
+              'cache',
+              'serverOne',
+              'serverTwo',
+              'serverThree',
+              'mailAPI',
+            )
+          )
+          Promise.delay(20)
       workerOne:
         start: ->
           test.ok starting.equals(
@@ -145,7 +174,8 @@ module.exports =
           )
           Promise.delay(10)
         stop: ->
-          Promise.delay(100)
+          test.ok starting.equals(new Set())
+          Promise.delay(10)
       workerTwo:
         start: ->
           test.ok starting.equals(
@@ -156,7 +186,9 @@ module.exports =
           )
           Promise.delay(60)
         stop: ->
-          Promise.delay(100)
+          Promise.delay(60)
+
+    all = new Set Object.keys(services)
 
     ###################################################################################
     # graph
@@ -193,11 +225,6 @@ module.exports =
     ###################################################################################
     # start & stop
 
-    starting = new Set
-    running = new Set
-    stopping = new Set
-    stopped = new Set
-
     start = (names) ->
       starting.add names
       Promise.all names.map (name) ->
@@ -215,12 +242,16 @@ module.exports =
 
     stop = (names) ->
       stopping.add names
+      running.delete names
       return Promise.all names.map (name) ->
         callback = services[name].stop
         promise = Promise.resolve callback()
         promise.then ->
           stopping.delete name
-          stopped.add name
+          stopped = all
+            .clone()
+            .delete(running)
+            .delete(stopping)
           # stop all we can stop now that have not been stopped
           toStop = new Set(dag.whereAllChildrenIn(stopped.keys()))
             .delete(stopping)
@@ -230,10 +261,12 @@ module.exports =
 
     start(dag.parentless())
       .then ->
-        test.ok running.equals new Set Object.keys(services)
-        test.ok starting.equals new Set
+        test.ok running.equals all
+        test.equal starting.size, 0
+        test.equal stopping.size, 0
         stop dag.childless()
       .then ->
-        test.ok stopped.equals new Set Object.keys(services)
-        test.ok stopping.equals new Set
+        test.equal starting.size, 0
+        test.equal stopping.size, 0
+        test.equal running.size, 0
         test.done()
