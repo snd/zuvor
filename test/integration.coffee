@@ -33,6 +33,14 @@ module.exports =
           )
           Promise.delay(10)
         stop: ->
+          test.ok stopping.equals(
+            new Set(
+              'redisOne',
+              'redisTwo',
+              'mailAPI'
+            )
+          )
+          test.ok running.equals(new Set())
           Promise.delay(10)
       redisTwo:
         start: ->
@@ -44,6 +52,14 @@ module.exports =
           )
           Promise.delay(20)
         stop: ->
+          test.ok stopping.equals(
+            new Set(
+              'redisOne',
+              'redisTwo',
+              'mailAPI'
+            )
+          )
+          test.ok running.equals(new Set())
           Promise.delay(20)
       serverOne:
         start: ->
@@ -55,6 +71,24 @@ module.exports =
           )
           Promise.delay(5)
         stop: ->
+          test.ok stopping.equals(
+            new Set(
+              'workerTwo',
+              'serverOne',
+              'serverTwo',
+              'serverThree'
+            )
+          )
+          test.ok running.equals(
+            new Set(
+              'redisOne',
+              'redisTwo',
+              'postgres',
+              'elasticSearch',
+              'cache',
+              'mailAPI',
+            )
+          )
           Promise.delay(5)
       serverTwo:
         start: ->
@@ -66,6 +100,24 @@ module.exports =
           )
           Promise.delay(30)
         stop: ->
+          test.ok stopping.equals(
+            new Set(
+              'workerTwo',
+              'serverOne',
+              'serverTwo',
+              'serverThree'
+            )
+          )
+          test.ok running.equals(
+            new Set(
+              'redisOne',
+              'redisTwo',
+              'postgres',
+              'elasticSearch',
+              'cache',
+              'mailAPI',
+            )
+          )
           Promise.delay(30)
       serverThree:
         start: ->
@@ -77,6 +129,24 @@ module.exports =
           )
           Promise.delay(60)
         stop: ->
+          test.ok stopping.equals(
+            new Set(
+              'workerTwo',
+              'serverOne',
+              'serverTwo',
+              'serverThree'
+            )
+          )
+          test.ok running.equals(
+            new Set(
+              'redisOne',
+              'redisTwo',
+              'postgres',
+              'elasticSearch',
+              'cache',
+              'mailAPI',
+            )
+          )
           Promise.delay(60)
       elasticSearch:
         start: ->
@@ -88,6 +158,20 @@ module.exports =
           )
           Promise.delay(25)
         stop: ->
+          test.ok stopping.equals(
+            new Set(
+              'elasticSearch'
+              'postgres'
+              'cache'
+              'mailAPI'
+            )
+          )
+          test.ok running.equals(
+            new Set(
+              'redisOne',
+              'redisTwo',
+            )
+          )
           Promise.delay(25)
       mailAPI:
         start: ->
@@ -99,6 +183,21 @@ module.exports =
           )
           Promise.delay(60)
         stop: ->
+          test.ok stopping.equals(
+            new Set(
+              'serverThree'
+              'mailAPI'
+            )
+          )
+          test.ok running.equals(
+            new Set(
+              'redisOne',
+              'redisTwo',
+              'postgres',
+              'elasticSearch',
+              'cache',
+            )
+          )
           Promise.delay(60)
       cache:
         start: ->
@@ -110,6 +209,20 @@ module.exports =
           )
           Promise.delay(30)
         stop: ->
+          test.ok stopping.equals(
+            new Set(
+              'elasticSearch'
+              'postgres'
+              'cache'
+              'mailAPI'
+            )
+          )
+          test.ok running.equals(
+            new Set(
+              'redisOne',
+              'redisTwo',
+            )
+          )
           Promise.delay(30)
       postgres:
         start: ->
@@ -121,6 +234,20 @@ module.exports =
           )
           Promise.delay(15)
         stop: ->
+          test.ok stopping.equals(
+            new Set(
+              'elasticSearch'
+              'postgres'
+              'cache'
+              'mailAPI'
+            )
+          )
+          test.ok running.equals(
+            new Set(
+              'redisOne',
+              'redisTwo',
+            )
+          )
           Promise.delay(15)
       loadBalancer:
         start: ->
@@ -174,7 +301,26 @@ module.exports =
           )
           Promise.delay(10)
         stop: ->
-          test.ok starting.equals(new Set())
+          test.ok stopping.equals(
+            new Set(
+              'loadBalancer',
+              'workerOne',
+              'workerTwo',
+            )
+          )
+          test.ok running.equals(
+            new Set(
+              'redisOne',
+              'redisTwo',
+              'postgres',
+              'elasticSearch',
+              'cache',
+              'serverOne',
+              'serverTwo',
+              'serverThree',
+              'mailAPI',
+            )
+          )
           Promise.delay(10)
       workerTwo:
         start: ->
@@ -186,6 +332,26 @@ module.exports =
           )
           Promise.delay(60)
         stop: ->
+          test.ok stopping.equals(
+            new Set(
+              'loadBalancer',
+              'workerOne',
+              'workerTwo',
+            )
+          )
+          test.ok running.equals(
+            new Set(
+              'redisOne',
+              'redisTwo',
+              'postgres',
+              'elasticSearch',
+              'cache',
+              'serverOne',
+              'serverTwo',
+              'serverThree',
+              'mailAPI',
+            )
+          )
           Promise.delay(60)
 
     all = new Set Object.keys(services)
