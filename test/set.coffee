@@ -196,4 +196,8 @@ module.exports =
       clone.clear()
       test.equals 0, clone.size
 
+      # original set is unchanged
+      test.equals set.size, xs.length
+      test.deepEqual xs, set.keys()
+
     test.done()
