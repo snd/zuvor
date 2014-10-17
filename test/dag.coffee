@@ -20,9 +20,11 @@ module.exports =
       test.ok not dag.isBefore 'a', 'b'
       test.ok not dag.isBefore 'b', 'a'
 
-      test.equal 0, dag.elements().length
+      test.equal 0, dag.values().length
       test.equal 0, dag.parentless().length
       test.equal 0, dag.childless().length
+
+      test.deepEqual dag.edges(), []
 
       test.done()
 
@@ -36,7 +38,7 @@ module.exports =
       test.ok dag.isBefore 'a', 'b'
       test.ok not dag.isBefore 'b', 'a'
 
-      test.ok hasSameElements ['b', 'a'], dag.elements()
+      test.ok hasSameElements ['b', 'a'], dag.values()
 
       test.deepEqual ['a'], dag.parentless()
       test.deepEqual ['b'], dag.childless()
@@ -48,6 +50,8 @@ module.exports =
       test.deepEqual [], dag.whereAllChildrenIn []
       test.deepEqual [], dag.whereAllChildrenIn ['a']
       test.deepEqual ['a'], dag.whereAllChildrenIn ['b']
+
+      test.deepEqual dag.edges(), [['a', 'b']]
 
       test.done()
 
@@ -68,7 +72,7 @@ module.exports =
       test.ok dag.isBefore 'a', 'c'
       test.ok not dag.isBefore 'c', 'a'
 
-      test.ok hasSameElements ['b', 'a', 'c'], dag.elements()
+      test.ok hasSameElements ['b', 'a', 'c'], dag.values()
 
       test.deepEqual ['a'], dag.parentless()
       test.deepEqual ['c'], dag.childless()
@@ -82,6 +86,8 @@ module.exports =
       test.deepEqual [], dag.whereAllChildrenIn ['a']
       test.deepEqual ['a'], dag.whereAllChildrenIn ['b']
       test.deepEqual ['b'], dag.whereAllChildrenIn ['c']
+
+      test.deepEqual dag.edges(), [['a', 'b'], ['b', 'c']]
 
       test.done()
 
@@ -102,7 +108,7 @@ module.exports =
       test.ok dag.isBefore 'a', 'c'
       test.ok not dag.isBefore 'c', 'a'
 
-      test.ok hasSameElements ['b', 'a', 'c'], dag.elements()
+      test.ok hasSameElements ['b', 'a', 'c'], dag.values()
 
       test.deepEqual ['a'], dag.parentless()
       test.deepEqual ['c'], dag.childless()
@@ -118,6 +124,8 @@ module.exports =
       test.deepEqual [], dag.whereAllChildrenIn ['b']
       test.deepEqual ['a'], dag.whereAllChildrenIn ['b', 'c']
       test.deepEqual ['b'], dag.whereAllChildrenIn ['c']
+
+      test.deepEqual dag.edges(), [['a', 'b'], ['a', 'c'], ['b', 'c']]
 
       test.done()
 
@@ -155,7 +163,7 @@ module.exports =
         test.ok dag.isIn number
       test.ok not dag.isIn 16
 
-      test.ok hasSameElements numbers, dag.elements()
+      test.ok hasSameElements numbers, dag.values()
 
       test.ok hasSameElements [0, 1, 3, 4, 5], dag.parentless()
       test.ok hasSameElements [12, 13, 14, 11, 15], dag.childless()
@@ -186,6 +194,34 @@ module.exports =
       test.ok hasSameElements [8, 6], dag.whereAllChildrenIn [15]
       test.ok hasSameElements [9, 7, 10], dag.whereAllChildrenIn [11, 14]
       test.ok hasSameElements [10, 7], dag.whereAllChildrenIn [14]
+
+      test.deepEqual dag.edges(), [
+        [0, 7]
+        [0, 10]
+        [0, 13]
+        [1, 2]
+        [1, 9]
+        [1, 13]
+        [2, 10]
+        [2, 12]
+        [2, 13]
+        [2, 14]
+        [3, 6]
+        [3, 8]
+        [3, 9]
+        [3, 11]
+        [4, 7]
+        [5, 6]
+        [5, 7]
+        [5, 9]
+        [5, 10]
+        [6, 15]
+        [7, 14]
+        [8, 15]
+        [9, 11]
+        [9, 14]
+        [10, 14]
+      ]
 
       test.done()
 

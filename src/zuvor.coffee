@@ -215,11 +215,22 @@ do ->
     return false
 
   # O(n)
-  Dag.prototype.elements = ->
-    elements = []
+  Dag.prototype.keys = ->
+    keys = []
     for key,node of this.nodes
-      elements.push node.value
-    return elements
+      keys.push node.value
+    return keys
+
+  # O(?)
+  Dag.prototype.edges = ->
+    edges = []
+    for key,node of this.nodes
+      for key,child of node.children
+        edges.push [node.value, child.value]
+    return edges
+
+  # returns a reversed version of this dag
+  # Dag.prototype.reversed = ->
 
   # elements without parents
   # O(n)
@@ -304,6 +315,11 @@ do ->
       if v
         results.push this.nodes[k].value
     return results
+
+  Dag.prototype.values = Dag.prototype.keys
+
+  ###################################################################################
+  # module
 
   zuvor =
     Dag: Dag
