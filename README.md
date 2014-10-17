@@ -2,11 +2,15 @@
 
 ## TODO
 
-- clean up naming/terminology
+- rename dag to graph
+
+- use it from blaze
 
 - finish readme
-  - good short description
-  - good longer description
+  - description
+  - question sections
+  - example
+  - clean up naming/terminology
 
 - example.js (taken from integration test)
 
@@ -23,6 +27,8 @@
 > simple and reasonably fast implementation of DAGs (directed acyclic graphs) and sets
 > as building blocks for dynamically finding the optimal execution order
 > of interdependent tasks with nondeterministic execution times
+
+a task will run at the earliest possible point when it can run
 
 - [is it any good?](#is-it-any-good)
 - [how do i install it?](#how-do-i-install-it)
@@ -152,7 +158,26 @@ and we can discuss and how to implement it best.
 
 i appreciate it if you open an issue first before 
 
-## Set API
+## API
+
+##### `run(options)` -> `Promise`
+
+options:
+
+- `ids` an `Array` or `Set` of ids
+- `call` a `Function` that is called for each
+- `graph` an *optional* `Graph` that models the dependencies/order between the `ids`
+- `reversed` an *optional* `Boolean` (default `false`) whether to treat the `graph` (if present) in reverse order
+- `strict` an *optional* `Boolean` (default `false`)
+- `done` an *optional* `Set` (default `new Set()`) that contains
+  - side effected
+  - can be used to blacklist `ids`
+- `pending` an *optional* `Set` (default `new Set()`) that contains the ids
+  - `ids` in this set will not be called. can be used to blacklist `ids`.
+
+order between some of them
+
+### `Set`
 
 tries to follow the ECMA6 set api.
 
@@ -298,6 +323,6 @@ set.size;     // -> 0
 
 *O(1)*
 
-## Dag API
+### `Graph`
 
 ## [license: MIT](LICENSE)
