@@ -18,6 +18,8 @@
 - make sure travis is working
 - npm publish
 
+uses and includes a set and a dag datatype
+
 ---
 
 [![NPM version](https://badge.fury.io/js/zuvor.svg)](http://badge.fury.io/js/zuvor)
@@ -160,7 +162,7 @@ i appreciate it if you open an issue first before
 
 ## API
 
-##### `run(options)` -> `Promise`
+### `run(options)` -> `Promise`
 
 options:
 
