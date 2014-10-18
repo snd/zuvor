@@ -166,7 +166,7 @@ i appreciate it if you open an issue first before
 
 options:
 
-- `ids` an `Array` or `Set` of ids
+- `ids` an `Array` or [`Set`](#set) of ids
 - `call` a `Function` that is called for each
 - `graph` an *optional* `Graph` that models the dependencies/order between the `ids`
 - `reversed` an *optional* `Boolean` (default `false`) whether to treat the `graph` (if present) in reverse order
