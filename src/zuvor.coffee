@@ -257,17 +257,17 @@ do ->
     return elements
 
   # find those elements whose parents are all in xs
-  # O(xs.length)
-  Graph.prototype.whereAllParentsIn = (xs) ->
-    # dont inherit from the Object prototype such that we dont need to use hasOwnProperty
-    xsSet = Object.create(null)
+  Graph.prototype.whereAllParentsIn = (xs...) ->
+    unless xs instanceof Set
+      xs = new Set xs...
     # for fast lookup
     for x in xs
       xsSet[x] = true
     # dont inherit from the Object prototype such that we dont need to use hasOwnProperty
     resultSet = Object.create(null)
-    for x in xs
-      node = this.nodes[x]
+    that = this
+    xs.forEach (x) ->
+      node = that.nodes[x]
       unless node?
         throw new Error "searching whereAllParentsIn of `#{x}` which is not in graph"
       for key, child of node.children
@@ -275,11 +275,11 @@ do ->
         if resultSet[key]?
           continue
         # ignore nodes in the source set
-        if xsSet[key]?
+        if xs.has key
           continue
         allParentsIn = true
         for parentValue of child.parents
-          unless xsSet[parentValue]?
+          unless xs.has parentValue
             allParentsIn = false
             break
         resultSet[key] = allParentsIn
@@ -290,17 +290,14 @@ do ->
     return results
 
   # find those elements whose children are all in xs
-  # O(xs.length)
-  Graph.prototype.whereAllChildrenIn = (xs) ->
-    # dont inherit from the Object prototype such that we dont need to use hasOwnProperty
-    xsSet = Object.create(null)
-    # for fast lookup
-    for x in xs
-      xsSet[x] = true
+  Graph.prototype.whereAllChildrenIn = (xs...) ->
+    unless xs instanceof Set
+      xs = new Set xs...
     # dont inherit from the Object prototype such that we dont need to use hasOwnProperty
     resultSet = Object.create(null)
-    for x in xs
-      node = this.nodes[x]
+    that = this
+    xs.forEach (x) ->
+      node = that.nodes[x]
       unless node?
         throw new Error "searching whereAllChildrenIn of `#{x}` which is not in graph"
       for key, parent of node.parents
@@ -308,11 +305,11 @@ do ->
         if resultSet[key]?
           continue
         # ignore nodes in the source set
-        if xsSet[key]?
+        if xs.has key
           continue
         allChildrenIn = true
         for childValue of parent.children
-          unless xsSet[childValue]?
+          unless xs.has childValue
             allChildrenIn = false
             break
         resultSet[key] = allChildrenIn
