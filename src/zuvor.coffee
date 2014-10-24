@@ -1,6 +1,21 @@
 # do -> = module pattern in coffeescript
 
 do ->
+  zuvor = {}
+
+  ###################################################################################
+  # nodejs or browser?
+
+  if window?
+    unless window.Promise?
+      throw new Error 'zuvor requires Promise global by bluebird to be present'
+    window.zuvor = zuvor
+  else if module?.exports?
+    Promise = require 'bluebird'
+    module.exports = zuvor
+  else
+    throw new Error 'either the `window` global or the `module.exports` global must be present'
+
   ###################################################################################
   # helpers
 
@@ -12,7 +27,7 @@ do ->
   ###################################################################################
   # set
 
-  Set = (args...) ->
+  zuvor.Set = Set = (args...) ->
     # create a new object that doesn't inherit any properties from Object
     this._map = Object.create(null)
     this.size = 0
@@ -143,7 +158,7 @@ do ->
     addChild: (node) ->
       this.children[node.value] = node
 
-  Graph = ->
+  zuvor.Graph = Graph = ->
     # dont inherit from the Object prototype such that we dont need to use hasOwnProperty
     this.nodes = Object.create null
     return this
