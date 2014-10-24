@@ -185,7 +185,7 @@ order between some of them
 
 follows the ECMA6 set API where sensible.
 
-##### `new Set(Nothing or Array or Set)` -> `Set` create a set
+##### create a set: `new Set(Nothing or Array or Set)` -> `Set`
 
 ```javascript
 var emptySet = new Set();
@@ -198,7 +198,7 @@ var clonedSet = new Set(setFromArray);
 ```
 *O(n) where n = number of elements in argument array or set*
 
-##### `.size` = `Integer` number of elements in the set
+##### number of elements in the set: `.size` = `Integer`
 
 ```javascript
 new Set().size;                           // -> 0
@@ -207,7 +207,7 @@ new Set(1, 2, 3).size;                    // -> 3
 
 *O(1)*
 
-##### `.values()` or `.keys()` -> `Array` returns an array of all the elements in the set
+##### return an array of all the elements in the set: `.values()` or `.keys()` -> `Array`
 
 ```javascript
 new Set().values();                       // -> []
@@ -217,7 +217,7 @@ new Set(1, 2, 3).keys();                  // -> [1, 2, 3]
 
 *O(n) where n = number of elements in the set*
 
-##### `.toString()` -> `String` returns a string representation of the set
+##### return a string representation of the set: `.toString()` -> `String`
 
 ```javascript
 new Set().toString();                     // -> '#{}'
@@ -226,7 +226,7 @@ new Set(1, 2, 3).toString();              // -> '#{1 2 3}'
 
 *O(n) where n = number of elements in the set*
 
-##### `.equals(Set)` -> `Boolean` returns whether two sets contain the same elements
+##### return whether two sets contain the same elements: `.equals(Set or Array)` -> `Boolean`
 
 ```javascript
 new Set().equals(new Set());              // -> true
@@ -237,11 +237,14 @@ set.equals(new Set(1, 2));                // -> false
 set.equals(new Set(1, 2, 3));             // -> true
 
 set.equals(set);                          // -> true
+
+set.equals([1, 2, 3]);                    // -> true
+set.equals([1, 2]);                       // -> false
 ```
 
 *best case if size differs is O(1). worst case is O(n) where n = number of elements in the set*
 
-##### `.has(Value)` -> `Boolean` returns whether a value is in the set
+##### return whether a value is in the set: `.has(Value)` -> `Boolean`
 
 ```javascript
 var set = new Set(1, 2, 3);
@@ -251,7 +254,7 @@ set.has(4);                               // -> false
 
 *O(1)*
 
-##### `.add(Value or Array or Set)` -> `Set` add elements to the set and return set
+##### add elements to the set and return original set: `.add(Value or Array or Set)` -> `Set`
 
 ```javascript
 var set = new Set();
@@ -279,7 +282,7 @@ set.values();                             // -> [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
 *O(1) for a single value. O(n) for a set (array) where n = number of elements in the set (array)*
 
-##### `.delete(Value or Array or Set)` -> `Set` delete elements from the set and return set
+##### delete elements from the set and return original set: `.delete(Value or Array or Set)` -> `Set`
 
 ```javascript
 var set = new Set(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
@@ -307,7 +310,7 @@ set.values();                             // -> []
 
 *O(1) for a single value. O(n) for a set (array) where n = number of elements in the set (array)*
 
-##### `.clone()` -> `Set` returns a new set that has the same elements as the original set
+##### return a new set that has the same elements as the original set: `.clone()` -> `Set`
 
 ```javascript
 var set = new Set(1, 2, 3);
@@ -317,7 +320,7 @@ set.equals(clone);                        // -> true
 
 *O(n) where n = number of elements in the set*
 
-##### `.clear()` -> `Set` clears the set and returns it
+##### delete all elements from the set and return original set: `.clear()` -> `Set`
 
 ```javascript
 var set = new Set(1, 2, 3);
