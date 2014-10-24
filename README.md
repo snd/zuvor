@@ -254,7 +254,7 @@ set.has(4);                               // -> false
 
 *O(1)*
 
-##### add elements to the set and return original set: `.add(Value or Array or Set)` -> `Set`
+##### add elements to the set and return set: `.add(Value or Array or Set)` -> `Set`
 
 ```javascript
 var set = new Set();
@@ -282,7 +282,7 @@ set.values();                             // -> [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
 *O(1) for a single value. O(n) for a set (array) where n = number of elements in the set (array)*
 
-##### delete elements from the set and return original set: `.delete(Value or Array or Set)` -> `Set`
+##### delete elements from the set and return set: `.delete(Value or Array or Set)` -> `Set`
 
 ```javascript
 var set = new Set(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
@@ -310,7 +310,7 @@ set.values();                             // -> []
 
 *O(1) for a single value. O(n) for a set (array) where n = number of elements in the set (array)*
 
-##### return a new set that has the same elements as the original set: `.clone()` -> `Set`
+##### return a new set that has the same elements as the set: `.clone()` -> `Set`
 
 ```javascript
 var set = new Set(1, 2, 3);
@@ -320,7 +320,7 @@ set.equals(clone);                        // -> true
 
 *O(n) where n = number of elements in the set*
 
-##### delete all elements from the set and return original set: `.clear()` -> `Set`
+##### delete all elements from the set and return set: `.clear()` -> `Set`
 
 ```javascript
 var set = new Set(1, 2, 3);
