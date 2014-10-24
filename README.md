@@ -15,9 +15,9 @@
 
 - example.js (taken from integration test)
 
-- push
-- make sure travis is working
 - npm publish
+- publish
+- make sure travis is working
 
 ---
 
@@ -404,7 +404,7 @@ new Graph()
 
 *O(n) where n = number of edges in the graph*
 
-##### return array of all nodes that have no parents (no incoming edges): `.parentless()` -> `Array`
+##### return nodes that have no parents (no incoming edges): `.parentless()` -> `Array`
 
 ```javascript
 new Graph()
@@ -414,7 +414,7 @@ new Graph()
 
 *O(n) where n = number of nodes in the graph*
 
-##### return array of all nodes that have no children (no outgoing edges): `.childless()` -> `Array`
+##### return nodes that have no children (no outgoing edges): `.childless()` -> `Array`
 
 ```javascript
 new Graph()
@@ -423,5 +423,41 @@ new Graph()
 ```
 
 *O(n) where n = number of nodes in the graph*
+
+##### return nodes whose parents are all in array: `.whereAllParentsIn(Array or Set)` -> `Array`
+
+```javascript
+var graph = new Graph()
+  .add('a', 'b')
+  .add('a', 'c')
+  .add('c', 'd')
+  .add('b', 'd')
+
+graph.whereAllParentsIn(['a']);                           // -> ['b', 'c']
+// nodes in the source array are not in the output array
+graph.whereAllParentsIn(['a', 'b']);                      // -> ['c']
+graph.whereAllParentsIn(new Set('a', 'b', 'c'));          // -> ['d']
+```
+
+*worst case: O(n * m) where n = number of elements in the array/set and
+m = max number of parents of any node in the array/set*
+
+##### return nodes whose children are all in array: `.whereAllChildrenIn(Array or Set)` -> `Array`
+
+```javascript
+var graph = new Graph()
+  .add('a', 'b')
+  .add('a', 'c')
+  .add('c', 'd')
+  .add('b', 'd')
+
+graph.whereAllChildrenIn(['d']);                           // -> ['c', 'b']
+// nodes in the source array are not in the output array
+graph.whereAllChildrenIn(['d', 'b']);                      // -> ['c']
+graph.whereAllChildrenIn(new Set('d', 'b', 'c'));          // -> ['a']
+```
+
+*worst case: O(n * m) where n = number of elements in the array/set and
+m = max number of children of any node in the array/set*
 
 ## [license: MIT](LICENSE)
