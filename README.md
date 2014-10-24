@@ -2,9 +2,9 @@
 
 ## TODO
 
-- rename dag to graph
+- write run function
 
-- use it from blaze
+- use vorrang from blaze
 
 - finish readme
   - description
@@ -18,7 +18,9 @@
 - make sure travis is working
 - npm publish
 
-uses and includes a set and a dag datatype
+---
+
+uses and includes a set and a graph datatype
 
 ---
 
@@ -168,8 +170,8 @@ options:
 
 - `ids` an `Array` or [`Set`](#set) of ids
 - `call` a `Function` that is called for each
-- `graph` an *optional* `Graph` that models the dependencies/order between the `ids`
-- `reversed` an *optional* `Boolean` (default `false`) whether to treat the `graph` (if present) in reverse order
+- `graph` a `Graph` (optional) that models the dependencies/order between the `ids`
+- `reversed` a `Boolean` (optional, default `false`) whether to treat the `graph` (if present) in reverse order
 - `strict` an *optional* `Boolean` (default `false`)
 - `done` an *optional* `Set` (default `new Set()`) that contains
   - side effected
@@ -181,7 +183,7 @@ order between some of them
 
 ### `Set`
 
-tries to follow the ECMA6 set api.
+loosely follows the ECMA6 set api where possible.
 
 ##### `new Set(Nothing or Array or Set)` -> `Set` create a set
 
