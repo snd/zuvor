@@ -1,6 +1,6 @@
 Promise = require 'bluebird'
 
-{Dag, Set} = require('../src/zuvor')
+{Graph, Set} = require('../src/zuvor')
 
 ###################################################################################
 # test
@@ -359,34 +359,34 @@ module.exports =
     ###################################################################################
     # graph
 
-    dag = new Dag()
-      .before('redisOne', 'cache')
-      .before('redisTwo', 'cache')
+    graph = new Graph()
+      .add('redisOne', 'cache')
+      .add('redisTwo', 'cache')
 
-      .before('cache', 'serverOne')
-      .before('cache', 'serverTwo')
-      .before('cache', 'serverThree')
+      .add('cache', 'serverOne')
+      .add('cache', 'serverTwo')
+      .add('cache', 'serverThree')
 
-      .before('postgres', 'serverOne')
-      .before('postgres', 'serverTwo')
-      .before('postgres', 'serverThree')
+      .add('postgres', 'serverOne')
+      .add('postgres', 'serverTwo')
+      .add('postgres', 'serverThree')
 
-      .before('elasticSearch', 'serverOne')
-      .before('elasticSearch', 'serverTwo')
-      .before('elasticSearch', 'serverThree')
+      .add('elasticSearch', 'serverOne')
+      .add('elasticSearch', 'serverTwo')
+      .add('elasticSearch', 'serverThree')
 
-      .before('elasticSearch', 'workerOne')
-      .before('elasticSearch', 'workerTwo')
+      .add('elasticSearch', 'workerOne')
+      .add('elasticSearch', 'workerTwo')
 
-      .before('postgres', 'workerOne')
-      .before('postgres', 'workerTwo')
+      .add('postgres', 'workerOne')
+      .add('postgres', 'workerTwo')
 
-      .before('mailAPI', 'workerOne')
-      .before('mailAPI', 'workerTwo')
+      .add('mailAPI', 'workerOne')
+      .add('mailAPI', 'workerTwo')
 
-      .before('serverOne', 'loadBalancer')
-      .before('serverTwo', 'loadBalancer')
-      .before('serverThree', 'loadBalancer')
+      .add('serverOne', 'loadBalancer')
+      .add('serverTwo', 'loadBalancer')
+      .add('serverThree', 'loadBalancer')
 
     ###################################################################################
     # start & stop
@@ -400,7 +400,7 @@ module.exports =
           starting.delete name
           running.add name
           # start all we can start now that have not been started
-          toStart = new Set(dag.whereAllParentsIn(running.keys()))
+          toStart = new Set(graph.whereAllParentsIn(running.keys()))
             .delete(starting)
             .delete(running)
             .keys()
@@ -419,18 +419,28 @@ module.exports =
             .delete(running)
             .delete(stopping)
           # stop all we can stop now that have not been stopped
-          toStop = new Set(dag.whereAllChildrenIn(stopped.keys()))
+          toStop = new Set(graph.whereAllChildrenIn(stopped.keys()))
             .delete(stopping)
             .delete(stopped)
             .keys()
           stop toStop
 
-    start(dag.parentless())
+#     zuvor.run(
+#       graph: graph
+#       call: (id, upstream) -> services[name].start()
+#       running: starting
+#       finished: running
+#       ids:
+#       blacklist:
+#       strict:
+#     ).then ->
+#
+    start(graph.parentless())
       .then ->
         test.ok running.equals all
         test.equal starting.size, 0
         test.equal stopping.size, 0
-        stop dag.childless()
+        stop graph.childless()
       .then ->
         test.equal starting.size, 0
         test.equal stopping.size, 0

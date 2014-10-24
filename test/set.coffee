@@ -8,6 +8,9 @@ module.exports =
     test.ok not set.has 'A'
     test.equal set.toString(), '#{}'
 
+    test.ok set.equals []
+    test.ok not set.equals ['A']
+
     test.done()
 
   'one element': (test) ->
@@ -15,11 +18,16 @@ module.exports =
 
     set
       .add 'A'
+      # adding twice is idempotent
       .add 'A'
 
     test.ok set.has 'A'
     test.ok not set.has 'B'
     test.equal set.toString(), '#{A}'
+
+    test.ok not set.equals []
+    test.ok set.equals ['A']
+    test.ok not set.equals ['A', 'B']
 
     test.done()
 
@@ -41,6 +49,10 @@ module.exports =
     test.ok not set.has 3.3
     test.ok not set.has 'B'
     test.equal set.toString(), '#{1 2.2 A}'
+
+    test.ok not set.equals []
+    test.ok set.equals [2.2, 'A', 1]
+    test.ok not set.equals [2.2]
 
     test.done()
 
@@ -169,6 +181,12 @@ module.exports =
 
       # any set is equal to itself
       test.ok set.equals set
+
+      # set is equal to array that created it
+      test.ok set.equals xs
+
+      # set is equal to its keys
+      test.ok set.equals set.keys()
 
       # any set is equal to its clone
       test.ok set.equals set.clone()

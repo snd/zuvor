@@ -26,8 +26,15 @@ do ->
       this._map[x]?
     # O(1) best case. O(n) worst case.
     equals: (other) ->
+      if Array.isArray other
+        if other.length isnt this.size
+          return false
+        for x in other
+          unless this.has x
+            return false
+        return true
       unless other instanceof Set
-        throw new TypeError 'argument must be a set'
+        throw new TypeError 'argument must be a set or array'
       that = this
       that.size is other.size and other.keys().every (x) ->
         that.has x
@@ -136,21 +143,21 @@ do ->
     addChild: (node) ->
       this.children[node.value] = node
 
-  Dag = ->
+  Graph = ->
     # dont inherit from the Object prototype such that we dont need to use hasOwnProperty
     this.nodes = Object.create null
     return this
 
-  Dag.prototype = {}
+  Graph.prototype = {}
 
-  # O(1) if a and b not in dag. O(?) otherwise
-  Dag.prototype.before = (a, b) ->
+  # O(1) if a and b not in graph. O(?) otherwise
+  Graph.prototype.add = (a, b) ->
     typeA = typeof a
     if not (typeA is 'string' or typeA is 'number')
-      throw new TypeError "argument a must be a string or number but is #{typeA}"
+      throw new TypeError "first argument must be a string or number but is #{typeA}"
     typeB = typeof b
     if not (typeB is 'string' or typeB is 'number')
-      throw new TypeError "argument b must be a string or number but is #{typeB}"
+      throw new TypeError "second argument must be a string or number but is #{typeB}"
 
     # keep it irreflexive (not a < a)
     if a is b
@@ -159,7 +166,7 @@ do ->
     # check that asymetry is kept
     # keeping transitivity
     # keeping it cycle free
-    if this.isBefore b, a
+    if this.has b, a
       throw new Error "trying to set `#{a}` -> `#{b}` but already `#{b}` -> `#{a}`"
 
     nodeA = this.nodes[a]
@@ -178,12 +185,11 @@ do ->
     # for chaining
     return this
 
-  # O(1)
-  Dag.prototype.isIn = (x) ->
-    this.nodes[x]?
+  # O(1) if called with only one argument O(?) otherwise
+  Graph.prototype.has = (a, b) ->
+    unless b?
+      return this.nodes[a]?
 
-  # O(?)
-  Dag.prototype.isBefore = (a, b) ->
     that = this
 
     nodeA = this.nodes[a]
@@ -215,26 +221,26 @@ do ->
     return false
 
   # O(n)
-  Dag.prototype.keys = ->
+  Graph.prototype.keys = ->
     keys = []
     for key,node of this.nodes
       keys.push node.value
     return keys
 
   # O(?)
-  Dag.prototype.edges = ->
+  Graph.prototype.edges = ->
     edges = []
     for key,node of this.nodes
       for key,child of node.children
         edges.push [node.value, child.value]
     return edges
 
-  # returns a reversed version of this dag
-  # Dag.prototype.reversed = ->
+  # returns a reversed version of this graph
+  # Graph.prototype.reversed = ->
 
   # elements without parents
   # O(n)
-  Dag.prototype.parentless = ->
+  Graph.prototype.parentless = ->
     elements = []
     for key,node of this.nodes
       if isObjectEmpty node.parents
@@ -243,7 +249,7 @@ do ->
 
   # elements without children
   # O(n)
-  Dag.prototype.childless = ->
+  Graph.prototype.childless = ->
     elements = []
     for key,node of this.nodes
       if isObjectEmpty node.children
@@ -252,7 +258,7 @@ do ->
 
   # find those elements whose parents are all in xs
   # O(xs.length)
-  Dag.prototype.whereAllParentsIn = (xs) ->
+  Graph.prototype.whereAllParentsIn = (xs) ->
     # dont inherit from the Object prototype such that we dont need to use hasOwnProperty
     xsSet = Object.create(null)
     # for fast lookup
@@ -285,7 +291,7 @@ do ->
 
   # find those elements whose children are all in xs
   # O(xs.length)
-  Dag.prototype.whereAllChildrenIn = (xs) ->
+  Graph.prototype.whereAllChildrenIn = (xs) ->
     # dont inherit from the Object prototype such that we dont need to use hasOwnProperty
     xsSet = Object.create(null)
     # for fast lookup
@@ -316,14 +322,25 @@ do ->
         results.push this.nodes[k].value
     return results
 
-  Dag.prototype.values = Dag.prototype.keys
+  Graph.prototype.values = Graph.prototype.keys
+
+  ###################################################################################
+  # run
+
+  run = (options) ->
+    options.call =
+    options.graph =
+    options.exclude =
+    options.isStrict =
+    options.ids
 
   ###################################################################################
   # module
 
   zuvor =
-    Dag: Dag
+    Graph: Graph
     Set: Set
+    run: run
 
   ###################################################################################
   # nodejs or browser?
