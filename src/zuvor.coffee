@@ -24,6 +24,9 @@ do ->
       return false
     return true
 
+  isThenable = (x) ->
+    x is Object(x) and 'function' is typeof x.then
+
   ###################################################################################
   # set
 
