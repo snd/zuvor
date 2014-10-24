@@ -6,34 +6,35 @@ var benchmark = function(n) {
 
   console.time('add');
   var set = new Set();
-  for(i = 1; i < n; i++) {
+  for(i = 0; i < n; i++) {
     set.add(i);
   }
   console.timeEnd('add');
 
-  assert(!set.isEmpty());
+  assert.equal(set.size, n);
 
-  console.time('isIn');
+  console.time('has');
   for(i = 1; i < n; i++) {
-    set.isIn(i);
+    assert(set.has(i));
   }
-  console.timeEnd('isIn');
+  console.timeEnd('has');
 
-  console.time('elements');
-  set.elements();
-  console.timeEnd('elements');
+  console.time('keys');
+  var keys = set.keys();
+  console.timeEnd('keys');
+  assert.equal(n, keys.length);
 
-  console.time('isEqual');
-  assert(set.isEqual(set));
-  console.timeEnd('isEqual');
+  console.time('equals');
+  assert(set.equals(set));
+  console.timeEnd('equals');
 
-  console.time('remove');
-  for(i = 1; i < n; i++) {
-    set.remove(i);
+  console.time('delete');
+  for(i = 0; i < n; i++) {
+    set.delete(i);
   }
-  console.timeEnd('remove');
+  console.timeEnd('delete');
 
-  assert(set.isEmpty());
+  assert.equal(set.size, 0);
 
   console.log('\n');
 };
