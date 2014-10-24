@@ -2,9 +2,6 @@ Promise = require 'bluebird'
 
 {Graph, Set, run} = require('../src/zuvor')
 
-###################################################################################
-# test
-
 module.exports =
 
   'systems are started and stopped in the most efficient order': (test) ->
