@@ -1,6 +1,6 @@
 Promise = require 'bluebird'
 
-{Graph, Set} = require('../src/zuvor')
+{Graph, Set, run} = require('../src/zuvor')
 
 ###################################################################################
 # test
@@ -8,16 +8,18 @@ Promise = require 'bluebird'
 module.exports =
 
   'systems are started and stopped in the most efficient order': (test) ->
-    test.expect (12 * 4) + 3 + 3
+    # test.expect (12 * 4) + (2 * 4)
 
     starting = new Set
     running = new Set
     stopping = new Set
+    stopped = new Set
 
     debug = ->
       console.log 'starting', starting.toString()
       console.log 'stopping', stopping.toString()
       console.log 'running', running.toString()
+      console.log 'stopped', stopped.toString()
 
     ###################################################################################
     # services
@@ -25,333 +27,331 @@ module.exports =
     services =
       redisOne:
         start: ->
-          test.ok starting.equals(
-            new Set('redisOne', 'redisTwo', 'postgres', 'elasticSearch', 'mailAPI')
-          )
-          test.ok running.equals(
-            new Set
-          )
+          test.ok starting.equals([
+            'redisOne'
+            'redisTwo'
+            'postgres'
+            'elasticSearch'
+            'mailAPI'
+          ])
+          test.ok running.equals([])
           Promise.delay(10)
         stop: ->
-          test.ok stopping.equals(
-            new Set(
-              'redisOne',
-              'redisTwo',
-              'mailAPI'
-            )
-          )
-          test.ok running.equals(new Set())
+          test.ok stopping.equals([
+            'redisOne',
+            'redisTwo',
+            'mailAPI'
+          ])
+          test.ok stopped.equals([
+            'serverOne'
+            'serverTwo'
+            'serverThree'
+            'elasticSearch'
+            'cache'
+            'postgres'
+            'loadBalancer'
+            'workerOne'
+            'workerTwo'
+          ])
           Promise.delay(10)
       redisTwo:
         start: ->
-          test.ok starting.equals(
-            new Set('redisOne', 'redisTwo', 'postgres', 'elasticSearch', 'mailAPI')
-          )
-          test.ok running.equals(
-            new Set
-          )
+          test.ok starting.equals([
+            'redisOne'
+            'redisTwo'
+            'postgres'
+            'elasticSearch'
+            'mailAPI'
+          ])
+          test.ok running.equals([])
           Promise.delay(20)
         stop: ->
-          test.ok stopping.equals(
-            new Set(
-              'redisOne',
-              'redisTwo',
-              'mailAPI'
-            )
-          )
-          test.ok running.equals(new Set())
+          test.ok stopping.equals([
+            'redisOne',
+            'redisTwo',
+            'mailAPI'
+          ])
+          test.ok stopped.equals([
+            'serverOne'
+            'serverTwo'
+            'serverThree'
+            'elasticSearch'
+            'cache'
+            'postgres'
+            'loadBalancer'
+            'workerOne'
+            'workerTwo'
+          ])
           Promise.delay(20)
       serverOne:
         start: ->
-          test.ok starting.equals(
-            new Set('mailAPI', 'serverOne', 'serverTwo', 'serverThree')
-          )
-          test.ok running.equals(
-            new Set('redisOne', 'redisTwo', 'postgres', 'elasticSearch', 'cache')
-          )
+          test.ok starting.equals([
+            'mailAPI'
+            'serverOne'
+            'serverTwo'
+            'serverThree'
+          ])
+          test.ok running.equals([
+            'redisOne'
+            'redisTwo'
+            'postgres'
+            'elasticSearch'
+            'cache'
+          ])
           Promise.delay(5)
         stop: ->
-          test.ok stopping.equals(
-            new Set(
-              'workerTwo',
-              'serverOne',
-              'serverTwo',
-              'serverThree'
-            )
-          )
-          test.ok running.equals(
-            new Set(
-              'redisOne',
-              'redisTwo',
-              'postgres',
-              'elasticSearch',
-              'cache',
-              'mailAPI',
-            )
-          )
+          test.ok stopping.equals([
+            'workerTwo',
+            'serverOne',
+            'serverTwo',
+            'serverThree'
+          ])
+          test.ok stopped.equals([
+            'workerOne'
+            'loadBalancer'
+          ])
           Promise.delay(5)
       serverTwo:
         start: ->
-          test.ok starting.equals(
-            new Set(['mailAPI', 'serverOne', 'serverTwo', 'serverThree'])
-          )
-          test.ok running.equals(
-            new Set(['redisOne', 'redisTwo', 'postgres', 'elasticSearch', 'cache'])
-          )
+          test.ok starting.equals([
+            'mailAPI'
+            'serverOne'
+            'serverTwo'
+            'serverThree'
+          ])
+          test.ok running.equals([
+            'redisOne'
+            'redisTwo'
+            'postgres'
+            'elasticSearch'
+            'cache'
+          ])
           Promise.delay(30)
         stop: ->
-          test.ok stopping.equals(
-            new Set(
-              'workerTwo',
-              'serverOne',
-              'serverTwo',
-              'serverThree'
-            )
-          )
-          test.ok running.equals(
-            new Set(
-              'redisOne',
-              'redisTwo',
-              'postgres',
-              'elasticSearch',
-              'cache',
-              'mailAPI',
-            )
-          )
+          test.ok stopping.equals([
+            'workerTwo',
+            'serverOne',
+            'serverTwo',
+            'serverThree'
+          ])
+          test.ok stopped.equals([
+            'workerOne'
+            'loadBalancer'
+          ])
           Promise.delay(30)
       serverThree:
         start: ->
-          test.ok starting.equals(
-            new Set(['mailAPI', 'serverOne', 'serverTwo', 'serverThree'])
-          )
-          test.ok running.equals(
-            new Set(['redisOne', 'redisTwo', 'postgres', 'elasticSearch', 'cache'])
-          )
+          test.ok starting.equals([
+            'mailAPI'
+            'serverOne'
+            'serverTwo'
+            'serverThree'
+          ])
+          test.ok running.equals([
+            'redisOne'
+            'redisTwo'
+            'postgres'
+            'elasticSearch'
+            'cache'
+          ])
           Promise.delay(60)
         stop: ->
-          test.ok stopping.equals(
-            new Set(
-              'workerTwo',
-              'serverOne',
-              'serverTwo',
-              'serverThree'
-            )
-          )
-          test.ok running.equals(
-            new Set(
-              'redisOne',
-              'redisTwo',
-              'postgres',
-              'elasticSearch',
-              'cache',
-              'mailAPI',
-            )
-          )
+          test.ok stopping.equals([
+            'workerTwo',
+            'serverOne',
+            'serverTwo',
+            'serverThree'
+          ])
+          test.ok stopped.equals([
+            'workerOne'
+            'loadBalancer'
+          ])
           Promise.delay(60)
       elasticSearch:
         start: ->
-          test.ok starting.equals(
-            new Set('redisOne', 'redisTwo', 'postgres', 'elasticSearch', 'mailAPI')
-          )
-          test.ok running.equals(
-            new Set
-          )
+          test.ok starting.equals([
+            'redisOne'
+            'redisTwo'
+            'postgres'
+            'elasticSearch'
+            'mailAPI'
+          ])
+          test.ok running.equals([])
           Promise.delay(25)
         stop: ->
-          test.ok stopping.equals(
-            new Set(
-              'elasticSearch'
-              'postgres'
-              'cache'
-              'mailAPI'
-            )
-          )
-          test.ok running.equals(
-            new Set(
-              'redisOne',
-              'redisTwo',
-            )
-          )
+          test.ok stopping.equals([
+            'elasticSearch'
+            'postgres'
+            'cache'
+            'mailAPI'
+          ])
+          test.ok stopped.equals([
+            'serverOne'
+            'serverTwo'
+            'serverThree'
+            'loadBalancer'
+            'workerOne'
+            'workerTwo'
+          ])
           Promise.delay(25)
       mailAPI:
         start: ->
-          test.ok starting.equals(
-            new Set('redisOne', 'redisTwo', 'postgres', 'elasticSearch', 'mailAPI')
-          )
-          test.ok running.equals(
-            new Set
-          )
+          test.ok starting.equals([
+            'redisOne'
+            'redisTwo'
+            'postgres'
+            'elasticSearch'
+            'mailAPI'
+          ])
+          test.ok running.equals([])
           Promise.delay(60)
         stop: ->
-          test.ok stopping.equals(
-            new Set(
-              'serverThree'
-              'mailAPI'
-            )
-          )
-          test.ok running.equals(
-            new Set(
-              'redisOne',
-              'redisTwo',
-              'postgres',
-              'elasticSearch',
-              'cache',
-            )
-          )
+          test.ok stopping.equals([
+            'serverThree'
+            'mailAPI'
+          ])
+          test.ok stopped.equals([
+            'serverOne'
+            'serverTwo'
+            'loadBalancer'
+            'workerOne'
+            'workerTwo'
+          ])
           Promise.delay(60)
       cache:
         start: ->
-          test.ok starting.equals(
-            new Set('elasticSearch', 'mailAPI', 'cache')
-          )
-          test.ok running.equals(
-            new Set('redisOne', 'redisTwo', 'postgres')
-          )
+          test.ok starting.equals([
+            'elasticSearch'
+            'mailAPI'
+            'cache'
+          ])
+          test.ok running.equals([
+            'redisOne'
+            'redisTwo'
+            'postgres'
+          ])
           Promise.delay(30)
         stop: ->
-          test.ok stopping.equals(
-            new Set(
-              'elasticSearch'
-              'postgres'
-              'cache'
-              'mailAPI'
-            )
-          )
-          test.ok running.equals(
-            new Set(
-              'redisOne',
-              'redisTwo',
-            )
-          )
+          test.ok stopping.equals([
+            'elasticSearch'
+            'postgres'
+            'cache'
+            'mailAPI'
+          ])
+          test.ok stopped.equals([
+            'serverOne'
+            'serverTwo'
+            'serverThree'
+            'loadBalancer'
+            'workerOne'
+            'workerTwo'
+          ])
           Promise.delay(30)
       postgres:
         start: ->
-          test.ok starting.equals(
-            new Set('redisOne', 'redisTwo', 'postgres', 'elasticSearch', 'mailAPI')
-          )
-          test.ok running.equals(
-            new Set
-          )
+          test.ok starting.equals([
+            'redisOne'
+            'redisTwo'
+            'postgres'
+            'elasticSearch'
+            'mailAPI'
+          ])
+          test.ok running.equals([])
           Promise.delay(15)
         stop: ->
-          test.ok stopping.equals(
-            new Set(
-              'elasticSearch'
-              'postgres'
-              'cache'
-              'mailAPI'
-            )
-          )
-          test.ok running.equals(
-            new Set(
-              'redisOne',
-              'redisTwo',
-            )
-          )
+          test.ok stopping.equals([
+            'elasticSearch'
+            'postgres'
+            'cache'
+            'mailAPI'
+          ])
+          test.ok stopped.equals([
+            'serverOne'
+            'serverTwo'
+            'serverThree'
+            'loadBalancer'
+            'workerOne'
+            'workerTwo'
+          ])
           Promise.delay(15)
       loadBalancer:
         start: ->
-          test.ok starting.equals(
-            new Set('workerTwo', 'loadBalancer')
-          )
-          test.ok running.equals(
-            new Set(
-              'redisOne',
-              'redisTwo',
-              'postgres',
-              'elasticSearch',
-              'cache',
-              'serverOne',
-              'serverTwo',
-              'serverThree',
-              'mailAPI',
-              'workerOne'
-            )
-          )
+          test.ok starting.equals([
+            'workerTwo'
+            'loadBalancer'
+          ])
+          test.ok running.equals([
+            'redisOne',
+            'redisTwo',
+            'postgres',
+            'elasticSearch',
+            'cache',
+            'serverOne',
+            'serverTwo',
+            'serverThree',
+            'mailAPI',
+            'workerOne'
+          ])
           Promise.delay(20)
         stop: ->
-          test.ok stopping.equals(
-            new Set(
-              'loadBalancer',
-              'workerOne',
-              'workerTwo',
-            )
-          )
-          test.ok running.equals(
-            new Set(
-              'redisOne',
-              'redisTwo',
-              'postgres',
-              'elasticSearch',
-              'cache',
-              'serverOne',
-              'serverTwo',
-              'serverThree',
-              'mailAPI',
-            )
-          )
+          test.ok stopping.equals([
+            'loadBalancer'
+            'workerOne'
+            'workerTwo'
+          ])
+          test.ok stopped.equals([])
           Promise.delay(20)
       workerOne:
         start: ->
-          test.ok starting.equals(
-            new Set('serverTwo', 'serverThree', 'workerOne', 'workerTwo')
-          )
-          test.ok running.equals(
-            new Set('redisOne', 'redisTwo', 'postgres', 'elasticSearch', 'cache', 'serverOne', 'mailAPI')
-          )
+          test.ok starting.equals([
+            'serverTwo'
+            'serverThree'
+            'workerOne'
+            'workerTwo'
+          ])
+          test.ok running.equals([
+            'redisOne'
+            'redisTwo'
+            'postgres'
+            'elasticSearch'
+            'cache'
+            'serverOne'
+            'mailAPI'
+          ])
           Promise.delay(10)
         stop: ->
-          test.ok stopping.equals(
-            new Set(
-              'loadBalancer',
-              'workerOne',
-              'workerTwo',
-            )
-          )
-          test.ok running.equals(
-            new Set(
-              'redisOne',
-              'redisTwo',
-              'postgres',
-              'elasticSearch',
-              'cache',
-              'serverOne',
-              'serverTwo',
-              'serverThree',
-              'mailAPI',
-            )
-          )
+          test.ok stopping.equals([
+            'loadBalancer'
+            'workerOne'
+            'workerTwo'
+          ])
+          test.ok stopped.equals([])
           Promise.delay(10)
       workerTwo:
         start: ->
-          test.ok starting.equals(
-            new Set('serverTwo', 'serverThree', 'workerOne', 'workerTwo')
-          )
-          test.ok running.equals(
-            new Set('redisOne', 'redisTwo', 'postgres', 'elasticSearch', 'cache', 'serverOne', 'mailAPI')
-          )
+          test.ok starting.equals([
+            'serverTwo'
+            'serverThree'
+            'workerOne'
+            'workerTwo'
+          ])
+          test.ok running.equals([
+            'redisOne'
+            'redisTwo'
+            'postgres'
+            'elasticSearch'
+            'cache'
+            'serverOne'
+            'mailAPI'
+          ])
           Promise.delay(60)
         stop: ->
-          test.ok stopping.equals(
-            new Set(
-              'loadBalancer',
-              'workerOne',
-              'workerTwo',
-            )
-          )
-          test.ok running.equals(
-            new Set(
-              'redisOne',
-              'redisTwo',
-              'postgres',
-              'elasticSearch',
-              'cache',
-              'serverOne',
-              'serverTwo',
-              'serverThree',
-              'mailAPI',
-            )
-          )
+          test.ok stopping.equals([
+            'loadBalancer'
+            'workerOne'
+            'workerTwo'
+          ])
+          test.ok stopped.equals([])
           Promise.delay(60)
 
     all = new Set Object.keys(services)
@@ -391,58 +391,33 @@ module.exports =
     ###################################################################################
     # start & stop
 
-    start = (names) ->
-      starting.add names
-      Promise.all names.map (name) ->
-        callback = services[name].start
-        promise = Promise.resolve(callback())
-        promise.then ->
-          starting.delete name
-          running.add name
-          # start all we can start now that have not been started
-          toStart = new Set(graph.whereAllParentsIn(running.keys()))
-            .delete(starting)
-            .delete(running)
-            .keys()
-          start toStart
-
-    stop = (names) ->
-      stopping.add names
-      running.delete names
-      return Promise.all names.map (name) ->
-        callback = services[name].stop
-        promise = Promise.resolve callback()
-        promise.then ->
-          stopping.delete name
-          stopped = all
-            .clone()
-            .delete(running)
-            .delete(stopping)
-          # stop all we can stop now that have not been stopped
-          toStop = new Set(graph.whereAllChildrenIn(stopped.keys()))
-            .delete(stopping)
-            .delete(stopped)
-            .keys()
-          stop toStop
-
-#     zuvor.run(
-#       graph: graph
-#       call: (id, upstream) -> services[name].start()
-#       running: starting
-#       finished: running
-#       ids:
-#       blacklist:
-#       strict:
-#     ).then ->
-#
-    start(graph.parentless())
+    run(
+      ids: all
+      callback: (id) -> services[id].start()
+      graph: graph
+      pending: starting
+      done: running
+      debug: console.log.bind(console)
+    )
       .then ->
         test.ok running.equals all
         test.equal starting.size, 0
         test.equal stopping.size, 0
-        stop graph.childless()
+        test.equal stopped.size, 0
+
+        run(
+          ids: all
+          callback: (id) -> services[id].stop()
+          graph: graph
+          reversed: true
+          pending: stopping
+          done: stopped
+          debug: console.log.bind(console)
+        )
       .then ->
         test.equal starting.size, 0
+        test.ok running.equals all
         test.equal stopping.size, 0
-        test.equal running.size, 0
+        test.ok stopped.equals all
+
         test.done()
