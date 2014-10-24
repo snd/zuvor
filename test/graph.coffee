@@ -38,12 +38,18 @@ module.exports =
       test.deepEqual ['b'], graph.childless()
 
       test.deepEqual [], graph.whereAllParentsIn []
+      test.deepEqual [], graph.whereAllParentsIn new Set()
       test.deepEqual ['b'], graph.whereAllParentsIn ['a']
+      test.deepEqual ['b'], graph.whereAllParentsIn new Set('a')
       test.deepEqual [], graph.whereAllParentsIn ['b']
+      test.deepEqual [], graph.whereAllParentsIn new Set('b')
 
       test.deepEqual [], graph.whereAllChildrenIn []
+      test.deepEqual [], graph.whereAllChildrenIn new Set()
       test.deepEqual [], graph.whereAllChildrenIn ['a']
+      test.deepEqual [], graph.whereAllChildrenIn new Set('a')
       test.deepEqual ['a'], graph.whereAllChildrenIn ['b']
+      test.deepEqual ['a'], graph.whereAllChildrenIn new Set('b')
 
       test.deepEqual graph.edges(), [['a', 'b']]
 
