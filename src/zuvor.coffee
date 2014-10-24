@@ -337,27 +337,57 @@ do ->
   ###################################################################################
   # run
 
-  run = (options) ->
-    options.call =
-    options.graph =
-    options.exclude =
-    options.isStrict =
-    options.ids
+  zuvor.run = (options) ->
+    unless 'function' is typeof options.callback
+      throw new TypeError 'options.callback must be a Function'
 
-  ###################################################################################
-  # module
+    options.done ?= new Set
+    unless options.done instanceof Set
+      throw new TypeError 'options.done must be a Set'
 
-  zuvor =
-    Graph: Graph
-    Set: Set
-    run: run
+    options.pending ?= new Set
+    unless options.pending instanceof Set
+      throw new TypeError 'options.pending must be a Set'
 
-  ###################################################################################
-  # nodejs or browser?
+    if options.graph? and not options.graph instanceof Graph
+      throw new TypeError 'options.graph must be a Graph'
 
-  if window?
-    window.zuvor = zuvor
-  else if module?.exports?
-    module.exports = zuvor
-  else
-    throw new Error 'either the `window` global or the `module.exports` global must be present'
+    options.strict ?= false
+    options.reversed ?= false
+
+    if options.debug? and not 'function' is typeof options.debug
+      throw new TypeError 'options.debug must be a Function'
+
+    results = {}
+
+    start = (names) ->
+      valid = new Set(names).delete(options.pending).delete(options.done)
+      options.pending.add valid
+      Promise.all valid.keys().map (id) ->
+        # TODO pass in results of parents
+        promise = Promise.resolve options.callback id
+        promise.then (value) ->
+          options.pending.delete id
+          options.done.add id
+          results[id] = value
+
+          candidates = if options.reversed
+            options.graph.whereAllChildrenIn(options.done.keys())
+          else
+            options.graph.whereAllParentsIn(options.done.keys())
+
+          # start all we can start now that have not been started
+          next = new Set(candidates)
+            .delete(options.pending)
+            .delete(options.done)
+            .keys()
+          start next
+
+    # TODO we can start all those that are not in the graph
+    #
+    # if not strict ignore those in the graph that are not in ids
+
+    start if options.reversed
+      options.graph.childless()
+    else
+      options.graph.parentless()
