@@ -42,12 +42,7 @@ do ->
     # O(1) best case. O(n) worst case.
     equals: (other) ->
       if Array.isArray other
-        if other.length isnt this.size
-          return false
-        for x in other
-          unless this.has x
-            return false
-        return true
+        other = new Set other
       unless other instanceof Set
         throw new TypeError 'argument must be a set or array'
       that = this
