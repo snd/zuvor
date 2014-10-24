@@ -358,7 +358,6 @@ var graph = new Graph()
 ##### return whether node `a` or path from `a` to `b` exists: `.has(a Value, [b Value])` -> `Boolean`
 
 ```javascript
-new Set().size;                           // -> 0
 var graph = new Graph()
   .add('a', 'b')
   .add('b', 'c')
@@ -369,21 +368,27 @@ graph.has('d');                           // -> false
 graph.has('a', 'b');                      // -> true
 graph.has('b', 'a');                      // -> false
 
-// transitive path
+// transitive path: a to c via b
 graph.has('a', 'c');                      // -> true
 ```
 
 *whether node exists: O(1)*
+
 *if direct edge between a and b exists: O(1)*
+
 *if a transitive path between a and b exists:
-worst case O(n * m) where n is the number of edges in the path and m is the max number of edges connected to a node.*
+worst case O(n * m) where n is the number of edges in the path and m is the max number of edges connected to any node in the graph.*
 
 ##### return an array of all the nodes in the graph: `.values()` or `.keys()` -> `Array`
 
 ```javascript
 new Graph().values();                     // -> []
-new Graph().add('a', 'b').values();       // -> ['a', 'b']
-new Graph().add('a', 'b').keys();         // -> ['a', 'b']
+new Graph()
+  .add('a', 'b')
+  .values();                              // -> ['a', 'b']
+new Graph()
+  .add('a', 'b')
+  .keys();                                // -> ['a', 'b']
 ```
 
 *O(n) where n = number of nodes in the graph*
@@ -391,10 +396,32 @@ new Graph().add('a', 'b').keys();         // -> ['a', 'b']
 ##### return an array of all the edges in the graph: `.edges()` -> `Array`
 
 ```javascript
-new Graph().edges();                      // -> []
-new Graph().add('a', 'b').edges();        // -> [['a', 'b']]
+new Graph() .edges();                     // -> []
+new Graph()
+  .add('a', 'b')
+  .edges();                               // -> [['a', 'b']]
 ```
 
 *O(n) where n = number of edges in the graph*
+
+##### return array of all nodes that have no parents (no incoming edges): `.parentless()` -> `Array`
+
+```javascript
+new Graph()
+  .add('a', 'b')
+  .parentless();                          // -> ['a']
+```
+
+*O(n) where n = number of nodes in the graph*
+
+##### return array of all nodes that have no children (no outgoing edges): `.childless()` -> `Array`
+
+```javascript
+new Graph()
+  .add('a', 'b')
+  .childless();                           // -> ['b']
+```
+
+*O(n) where n = number of nodes in the graph*
 
 ## [license: MIT](LICENSE)
