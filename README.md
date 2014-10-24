@@ -2,15 +2,16 @@
 
 ## TODO
 
-- write run function
+- write graph api in readme
+- document run function in readme
+- implement run function
 
-- use vorrang from blaze
+- use zuvor run function from blaze for shutdown
 
 - finish readme
   - description
   - question sections
   - example
-  - clean up naming/terminology
 
 - example.js (taken from integration test)
 
@@ -332,5 +333,68 @@ set.size;                                 // -> 0
 *O(1)*
 
 ### `Graph`
+
+`Value` = `String` or `Number`
+
+##### create a graph: `new Graph` -> `Graph`
+
+```javascript
+var graph = new Graph();
+```
+
+*O(1)*
+
+##### add an edge and return graph: `.add(from Value, to Value)` -> `Graph`
+
+```javascript
+var graph = new Graph()
+  .add('a', 'b')
+  .add('b', 'c')
+  .add('a', 'c');
+```
+
+*O(1)*
+
+##### return whether node `a` or path from `a` to `b` exists: `.has(a Value, [b Value])` -> `Boolean`
+
+```javascript
+new Set().size;                           // -> 0
+var graph = new Graph()
+  .add('a', 'b')
+  .add('b', 'c')
+
+graph.has('a');                           // -> true
+graph.has('d');                           // -> false
+
+graph.has('a', 'b');                      // -> true
+graph.has('b', 'a');                      // -> false
+
+// transitive path
+graph.has('a', 'c');                      // -> true
+```
+
+*whether node exists: O(1)*
+*if direct edge between a and b exists: O(1)*
+*if a transitive path between a and b exists:
+worst case O(n * m) where n is the number of edges in the path and m is the max number of edges connected to a node.*
+
+##### return an array of all the nodes in the graph: `.values()` or `.keys()` -> `Array`
+
+```javascript
+new Graph().values();                     // -> []
+new Graph().add('a', 'b').values();       // -> ['a', 'b']
+new Graph().add('a', 'b').keys();         // -> ['a', 'b']
+```
+
+*O(n) where n = number of nodes in the graph*
+
+##### return an array of all the edges in the graph: `.edges()` -> `Array`
+
+```javascript
+new Graph().edges();                      // -> []
+new Graph().add('a', 'b').edges();        // -> [['a', 'b']]
+```
+
+*O(n) where n = number of edges in the graph*
 
 ## [license: MIT](LICENSE)
