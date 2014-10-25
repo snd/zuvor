@@ -399,17 +399,26 @@ do ->
       valid = new Set(names).delete(options.pending).delete(options.done)
       options.pending.add valid
       Promise.all valid.keys().map (id) ->
-        # TODO pass in results of parents
-        promise = Promise.resolve options.callback id
+        parents = options.graph.parents(id)
+        if parents.length is 0
+          promise = Promise.resolve options.callback id
+        else
+          values = {}
+          for parent in parents
+            values[parent] = results[parent]
+          promise = Promise.resolve options.callback(id, values)
         promise.then (value) ->
           options.pending.delete id
           options.done.add id
           results[id] = value
 
+          keys = new Set(options.done.keys())
+            .delete(orderless)
+
           candidates = if options.reversed
-            options.graph.whereAllChildrenIn(options.done.keys())
+            options.graph.whereAllChildrenIn(keys)
           else
-            options.graph.whereAllParentsIn(options.done.keys())
+            options.graph.whereAllParentsIn(keys)
 
           # start all we can start now that have not been started
           next = new Set(candidates)
