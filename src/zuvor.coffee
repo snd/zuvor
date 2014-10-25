@@ -374,6 +374,21 @@ do ->
 
     results = {}
 
+    # immediately run those that have no order
+
+    orderless = new Set(options.ids).delete(options.graph.keys()).keys()
+
+    options.pending.add orderless
+
+    orderlessPromise = Promise.all orderless.map (id) ->
+      promise = Promise.resolve options.callback id
+      promise.then (value) ->
+        options.pending.delete id
+        options.done.add id
+        results[id] = value
+
+    # run those with order in order
+
     start = (names) ->
       valid = new Set(names).delete(options.pending).delete(options.done)
       options.pending.add valid
@@ -397,11 +412,12 @@ do ->
             .keys()
           start next
 
-    # TODO we can start all those that are not in the graph
-    #
-    # if not strict ignore those in the graph that are not in ids
-
-    start if options.reversed
+    orderedPromise = start if options.reversed
       options.graph.childless()
     else
       options.graph.parentless()
+
+    # wait for everything to finish and return results
+
+    Promise.all([orderlessPromise, orderedPromise]).then ->
+      results
