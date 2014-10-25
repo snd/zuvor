@@ -253,16 +253,22 @@ do ->
 
   # O(n) where n is the number of parents of x
   Graph.prototype.parents = (x) ->
+    node = this.nodes[x]
+    unless node?
+      return []
     elements = []
-    for key,node of this.nodes[x].parents
-      elements.push node.value
+    for key,parent of this.nodes[x].parents
+      elements.push parent.value
     return elements
 
   # O(n) where n is the number of children of x
   Graph.prototype.children = (x) ->
+    node = this.nodes[x]
+    unless node?
+      return []
     elements = []
-    for key,node of this.nodes[x].children
-      elements.push node.value
+    for key,child of this.nodes[x].children
+      elements.push child.value
     return elements
 
   # elements without parents
