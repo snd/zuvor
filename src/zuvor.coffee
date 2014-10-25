@@ -251,6 +251,20 @@ do ->
   # returns a reversed version of this graph
   # Graph.prototype.reversed = ->
 
+  # O(n) where n is the number of parents of x
+  Graph.prototype.parents = (x) ->
+    elements = []
+    for key,node of this.nodes[x].parents
+      elements.push node.value
+    return elements
+
+  # O(n) where n is the number of children of x
+  Graph.prototype.children = (x) ->
+    elements = []
+    for key,node of this.nodes[x].children
+      elements.push node.value
+    return elements
+
   # elements without parents
   # O(n)
   Graph.prototype.parentless = ->
