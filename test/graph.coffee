@@ -37,6 +37,12 @@ module.exports =
       test.deepEqual ['a'], graph.parentless()
       test.deepEqual ['b'], graph.childless()
 
+      test.deepEqual ['a'], graph.parents('b')
+      test.deepEqual [], graph.parents('a')
+
+      test.deepEqual ['b'], graph.children('a')
+      test.deepEqual [], graph.children('b')
+
       test.deepEqual [], graph.whereAllParentsIn []
       test.deepEqual [], graph.whereAllParentsIn new Set()
       test.deepEqual ['b'], graph.whereAllParentsIn ['a']
@@ -77,6 +83,14 @@ module.exports =
       test.deepEqual ['a'], graph.parentless()
       test.deepEqual ['c'], graph.childless()
 
+      test.deepEqual ['b'], graph.parents('c')
+      test.deepEqual ['a'], graph.parents('b')
+      test.deepEqual [], graph.parents('a')
+
+      test.deepEqual ['b'], graph.children('a')
+      test.deepEqual ['c'], graph.children('b')
+      test.deepEqual [], graph.children('c')
+
       test.deepEqual [], graph.whereAllParentsIn []
       test.deepEqual ['b'], graph.whereAllParentsIn ['a']
       test.deepEqual ['c'], graph.whereAllParentsIn ['b']
@@ -113,6 +127,14 @@ module.exports =
       test.deepEqual ['a'], graph.parentless()
       test.deepEqual ['c'], graph.childless()
 
+      test.ok new Set('b', 'a').equals graph.parents('c')
+      test.deepEqual ['a'], graph.parents('b')
+      test.deepEqual [], graph.parents('a')
+
+      test.ok new Set('b', 'c').equals graph.children('a')
+      test.deepEqual ['c'], graph.children('b')
+      test.deepEqual [], graph.children('c')
+
       test.deepEqual [], graph.whereAllParentsIn []
       test.deepEqual ['b'], graph.whereAllParentsIn ['a']
       test.deepEqual [], graph.whereAllParentsIn ['b']
@@ -135,6 +157,7 @@ module.exports =
         .add(0, 7)
         .add(0, 10)
         .add(0, 13)
+        .add(0, 14)
         .add(1, 2)
         .add(1, 9)
         .add(1, 13)
@@ -170,6 +193,12 @@ module.exports =
 
       test.ok new Set(12, 13, 14, 11, 15).equals graph.childless()
 
+      test.ok new Set(0, 1, 2).equals graph.parents(13)
+      test.ok new Set(2, 0, 10, 7, 9).equals graph.parents(14)
+
+      test.ok new Set(10, 12, 13, 14).equals graph.children(2)
+      test.ok new Set(10, 7, 9, 6).equals graph.children(5)
+
       test.ok new Set().equals graph.whereAllParentsIn []
       test.ok new Set(2).equals graph.whereAllParentsIn [1]
       test.ok new Set(6, 8).equals graph.whereAllParentsIn [5, 3]
@@ -199,6 +228,7 @@ module.exports =
         [0, 7]
         [0, 10]
         [0, 13]
+        [0, 14]
         [1, 2]
         [1, 9]
         [1, 13]
