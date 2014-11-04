@@ -2,13 +2,17 @@
 
 ## TODO
 
-- write graph api in readme
+- handle strictness
+  - build a scenario where that is a problem
+  - in graph but not in ids and blockings children that depend on it
+- test edge cases of the run function
+
 - document run function in readme
-- implement run function
 
 - use zuvor run function from blaze for shutdown
 
 - finish readme
+  - read api again
   - description
   - question sections
   - example
@@ -22,6 +26,12 @@
 ---
 
 uses and includes a set and a graph datatype
+
+where an order exists only for some services
+
+you can use it for
+
+tasks are run as soon as they are ready to run
 
 ---
 
@@ -78,7 +88,7 @@ first let's model the task order:
 
 only works with strings
 
-```javascript
+``` js
 var Vorrang = require('vorrang');
 
 var dag = new Vorrang()
@@ -89,7 +99,7 @@ var dag = new Vorrang()
 
 then i can find out what i can run immediately:
 
-```javascript
+``` js
 dag.minElements();
 // => ['C', 'D']
 ```
@@ -98,7 +108,7 @@ sweet - we can already start tasks `C` and `D`.
 
 let's assume `C` has finished.
 
-```javascript
+``` js
 vorrang.minUpperBound(dag, ['C', 'D'])
 // => ['A']
 ```
@@ -142,7 +152,7 @@ it currently uses too much memory
 
 here's the code its just x lines
 
-```javascript
+``` js
 parents
 children
 
@@ -167,20 +177,31 @@ i appreciate it if you open an issue first before
 
 ### `run(options)` -> `Promise`
 
+run will call `callback` once for every id in `ids` that is not in `done`.
+call them 
+
 options:
 
-- `ids` an `Array` or [`Set`](#set) of ids
-- `call` a `Function` that is called for each
+- `ids` an `Array` or [`Set`](#set) of ids to run
+- `callback` a `Function` that is called for each id that is not in `done`
+  - can return a promise
 - `graph` a `Graph` (optional) that models the dependencies/order between the `ids`
+- `done` an *optional* `Set` (default `new Set()`) that contains
+  - ids that are done are added to the set
+  - can be used to blacklist `ids`
+  - things that are already done are not run
+- `pending` an *optional* `Set` (default `new Set()`) that contains the ids
+  that have been called and have returned a promise that is not yet resolved
+  - `ids` in this set will not be called. can be used to blacklist `ids`.
 - `reversed` a `Boolean` (optional, default `false`) whether to treat the `graph` (if present) in reverse order
 - `strict` an *optional* `Boolean` (default `false`)
-- `done` an *optional* `Set` (default `new Set()`) that contains
-  - side effected
-  - can be used to blacklist `ids`
-- `pending` an *optional* `Set` (default `new Set()`) that contains the ids
-  - `ids` in this set will not be called. can be used to blacklist `ids`.
+- `debug`
+
+strict ignore orderings that dont exist
 
 order between some of them
+
+run returns a promise that is resolved when all things have been run
 
 ### `Set`
 
@@ -188,7 +209,7 @@ follows the ECMA6 set API where sensible.
 
 ##### create a set: `new Set(Nothing or Array or Set)` -> `Set`
 
-```javascript
+``` js
 var emptySet = new Set();
 // or
 var setFromArgs = new Set(1, 2, 3);
@@ -201,7 +222,7 @@ var clonedSet = new Set(setFromArray);
 
 ##### number of elements in the set: `.size` = `Integer`
 
-```javascript
+``` js
 new Set().size;                           // -> 0
 new Set(1, 2, 3).size;                    // -> 3
 ```
@@ -210,7 +231,7 @@ new Set(1, 2, 3).size;                    // -> 3
 
 ##### return an array of all the elements in the set: `.values()` or `.keys()` -> `Array`
 
-```javascript
+``` js
 new Set().values();                       // -> []
 new Set(1, 2, 3).values();                // -> [1, 2, 3]
 new Set(1, 2, 3).keys();                  // -> [1, 2, 3]
@@ -220,7 +241,7 @@ new Set(1, 2, 3).keys();                  // -> [1, 2, 3]
 
 ##### return a string representation of the set: `.toString()` -> `String`
 
-```javascript
+``` js
 new Set().toString();                     // -> '#{}'
 new Set(1, 2, 3).toString();              // -> '#{1 2 3}'
 ```
@@ -229,7 +250,7 @@ new Set(1, 2, 3).toString();              // -> '#{1 2 3}'
 
 ##### return whether two sets contain the same elements: `.equals(Set or Array)` -> `Boolean`
 
-```javascript
+``` js
 new Set().equals(new Set());              // -> true
 new Set().equals(new Set(1, 2, 3));       // -> false
 
@@ -247,7 +268,7 @@ set.equals([1, 2]);                       // -> false
 
 ##### return whether a value is in the set: `.has(Value)` -> `Boolean`
 
-```javascript
+``` js
 var set = new Set(1, 2, 3);
 set.has(1);                               // -> true
 set.has(4);                               // -> false
@@ -257,7 +278,7 @@ set.has(4);                               // -> false
 
 ##### add elements to the set and return set: `.add(Value or Array or Set)` -> `Set`
 
-```javascript
+``` js
 var set = new Set();
 
 set.add(1);
@@ -285,7 +306,7 @@ set.values();                             // -> [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
 ##### delete elements from the set and return set: `.delete(Value or Array or Set)` -> `Set`
 
-```javascript
+``` js
 var set = new Set(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
 
 set.delete(1);
@@ -313,7 +334,7 @@ set.values();                             // -> []
 
 ##### return a new set that has the same elements as the set: `.clone()` -> `Set`
 
-```javascript
+``` js
 var set = new Set(1, 2, 3);
 var clone = set.clone();
 set.equals(clone);                        // -> true
@@ -323,7 +344,7 @@ set.equals(clone);                        // -> true
 
 ##### delete all elements from the set and return set: `.clear()` -> `Set`
 
-```javascript
+``` js
 var set = new Set(1, 2, 3);
 set.size;                                 // -> 3
 set.clear();
@@ -338,7 +359,7 @@ set.size;                                 // -> 0
 
 ##### create a graph: `new Graph` -> `Graph`
 
-```javascript
+``` js
 var graph = new Graph();
 ```
 
@@ -346,7 +367,7 @@ var graph = new Graph();
 
 ##### add an edge and return graph: `.add(from Value, to Value)` -> `Graph`
 
-```javascript
+``` js
 var graph = new Graph()
   .add('a', 'b')
   .add('b', 'c')
@@ -357,7 +378,7 @@ var graph = new Graph()
 
 ##### return whether node `a` or path from `a` to `b` exists: `.has(a Value, [b Value])` -> `Boolean`
 
-```javascript
+``` js
 var graph = new Graph()
   .add('a', 'b')
   .add('b', 'c')
@@ -381,7 +402,7 @@ worst case O(n * m) where n is the number of edges in the path and m is the max 
 
 ##### return an array of all the nodes in the graph: `.values()` or `.keys()` -> `Array`
 
-```javascript
+``` js
 new Graph().values();                     // -> []
 new Graph()
   .add('a', 'b')
@@ -395,7 +416,7 @@ new Graph()
 
 ##### return an array of all the edges in the graph: `.edges()` -> `Array`
 
-```javascript
+``` js
 new Graph() .edges();                     // -> []
 new Graph()
   .add('a', 'b')
@@ -406,7 +427,7 @@ new Graph()
 
 ##### return nodes that have no parents (no incoming edges): `.parentless()` -> `Array`
 
-```javascript
+``` js
 new Graph()
   .add('a', 'b')
   .parentless();                          // -> ['a']
@@ -416,7 +437,7 @@ new Graph()
 
 ##### return nodes that have no children (no outgoing edges): `.childless()` -> `Array`
 
-```javascript
+``` js
 new Graph()
   .add('a', 'b')
   .childless();                           // -> ['b']
@@ -426,7 +447,7 @@ new Graph()
 
 ##### return nodes whose parents are all in array: `.whereAllParentsIn(Array or Set)` -> `Array`
 
-```javascript
+``` js
 var graph = new Graph()
   .add('a', 'b')
   .add('a', 'c')
@@ -444,7 +465,7 @@ m = max number of parents of any node in the array/set*
 
 ##### return nodes whose children are all in array: `.whereAllChildrenIn(Array or Set)` -> `Array`
 
-```javascript
+``` js
 var graph = new Graph()
   .add('a', 'b')
   .add('a', 'c')
