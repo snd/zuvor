@@ -2,41 +2,6 @@
 
 **THIS IS ALPHA, UNSTABLE, WORK IN PROGRESS !**
 
-## TODO
-
-- handle strictness
-  - build a scenario where that is a problem
-  - in graph but not in ids and blockings children that depend on it
-- test edge cases of the run function
-
-- document run function in readme
-
-- use zuvor run function from blaze for shutdown
-
-- finish readme
-  - read api again
-  - description
-  - question sections
-  - example
-
-- example.js (taken from integration test)
-
-- npm publish
-- publish
-- make sure travis is working
-
----
-
-uses and includes a set and a graph datatype
-
-where an order exists only for some services
-
-you can use it for
-
-tasks are run as soon as they are ready to run
-
----
-
 [![NPM version](https://badge.fury.io/js/zuvor.svg)](http://badge.fury.io/js/zuvor)
 [![Build Status](https://travis-ci.org/snd/zuvor.svg?branch=master)](https://travis-ci.org/snd/zuvor/branches)
 [![Dependencies](https://david-dm.org/snd/zuvor.svg)](https://david-dm.org/snd/zuvor)
@@ -484,3 +449,36 @@ graph.whereAllChildrenIn(new Set('d', 'b', 'c'));          // -> ['a']
 m = max number of children of any node in the array/set*
 
 ## [license: MIT](LICENSE)
+
+## TODO
+
+- handle strictness
+  - build a scenario where that is a problem
+  - in graph but not in ids and blockings children that depend on it
+- test edge cases of the run function
+
+- document run function in readme
+
+- use zuvor run function from blaze for shutdown
+
+- finish readme
+  - read api again
+  - description
+  - question sections
+  - example
+
+- example.js (taken from integration test)
+
+- npm publish
+- publish
+- make sure travis is working
+
+---
+
+uses and includes a set and a graph datatype
+
+where an order exists only for some services
+
+you can use it for
+
+tasks are run as soon as they are ready to run
