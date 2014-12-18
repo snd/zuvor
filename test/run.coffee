@@ -7,10 +7,8 @@ module.exports =
       ids: ['a', 'b', 'c']
       graph: new Graph
       callback: (id) ->
-        console.log id
         id
     ).then (result) ->
-      console.log result
       test.done()
 
   'values from parents are passed to children': (test) ->
