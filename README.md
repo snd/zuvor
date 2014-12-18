@@ -1,5 +1,7 @@
 # zuvor
 
+**THIS IS ALPHA, UNSTABLE, WORK IN PROGRESS !**
+
 ## TODO
 
 - handle strictness
